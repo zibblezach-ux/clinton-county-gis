@@ -88,6 +88,7 @@
   <h3>Election Participation</h3>
   <label><input type="checkbox" class="voterLayer" data-layer="primary_2024"> <span class="legend-dot" style="background:#b91c1c"></span>Aug. 2024 Primary Voters</label>
   <label><input type="checkbox" class="voterLayer" data-layer="general_2024"> <span class="legend-dot" style="background:#1d4ed8"></span>Nov. 2024 General Voters</label>
+  <label><input type="checkbox" class="voterLayer" data-layer="april_2026_municipal"> <span class="legend-dot" style="background:#16a34a"></span>Apr. 2026 Municipal Voters</label>
   <h3>Habitual Voter Base</h3>
   <label><input type="checkbox" class="voterLayer" data-layer="never_voted"> <span class="legend-dot" style="background:#6b7280"></span>Never Voted</label>
   <label><input type="checkbox" class="voterLayer" data-layer="elections_1_2"> <span class="legend-dot" style="background:#a16207"></span>1–2 Elections</label>
@@ -112,6 +113,16 @@ L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_M
   attribution: "Tiles &copy; Esri &mdash; Esri, HERE, Garmin, USGS, and the GIS User Community"
 }).addTo(map);
 
+fetch("/api/roads/clinton")
+  .then(function(r) { return r.ok ? r.json() : null; })
+  .then(function(data) {
+    if (!data) return;
+    L.geoJSON(data, {
+      style: { color: "#ffffff", weight: 2, dashArray: "6,4", fillOpacity: 0.0 }
+    }).addTo(map);
+  })
+  .catch(function(err) { console.warn("County boundary failed", err); });
+
 const panel = document.getElementById("layerPanel");
 document.getElementById("openLayersBtn").addEventListener("click", () => {
   panel.classList.add("open");
@@ -123,17 +134,18 @@ document.getElementById("closeLayersBtn").addEventListener("click", () => {
 });
 
 const layerInfo = {
-  primary_2024:      { file:"static/voters/primary_2024.geojson",      color:"#b91c1c", label:"Aug. 2024 Primary Voters" },
-  general_2024:      { file:"static/voters/general_2024.geojson",      color:"#1d4ed8", label:"Nov. 2024 General Voters" },
-  never_voted:       { file:"static/voters/never_voted.geojson",       color:"#6b7280", label:"Never Voted" },
-  elections_1_2:     { file:"static/voters/elections_1_2.geojson",     color:"#a16207", label:"1–2 Elections" },
-  elections_3_5:     { file:"static/voters/elections_3_5.geojson",     color:"#047857", label:"3–5 Elections" },
-  elections_6_9:     { file:"static/voters/elections_6_9.geojson",     color:"#7c3aed", label:"6–9 Elections" },
-  elections_10_plus: { file:"static/voters/elections_10_plus.geojson", color:"#be123c", label:"10+ Elections" },
-  age_18_29:         { file:"static/voters/age_18_29.geojson",         color:"#0891b2", label:"Age 18–29" },
-  age_30_44:         { file:"static/voters/age_30_44.geojson",         color:"#2563eb", label:"Age 30–44" },
-  age_45_64:         { file:"static/voters/age_45_64.geojson",         color:"#9333ea", label:"Age 45–64" },
-  age_65_plus:       { file:"static/voters/age_65_plus.geojson",       color:"#dc2626", label:"Age 65+" }
+  primary_2024:      { file:"/static/voters/primary_2024.geojson",      color:"#b91c1c", label:"Aug. 2024 Primary Voters" },
+  general_2024:      { file:"/static/voters/general_2024.geojson",      color:"#1d4ed8", label:"Nov. 2024 General Voters" },
+  never_voted:       { file:"/static/voters/never_voted.geojson",       color:"#6b7280", label:"Never Voted" },
+  elections_1_2:     { file:"/static/voters/elections_1_2.geojson",     color:"#a16207", label:"1–2 Elections" },
+  elections_3_5:     { file:"/static/voters/elections_3_5.geojson",     color:"#047857", label:"3–5 Elections" },
+  elections_6_9:     { file:"/static/voters/elections_6_9.geojson",     color:"#7c3aed", label:"6–9 Elections" },
+  elections_10_plus: { file:"/static/voters/elections_10_plus.geojson", color:"#be123c", label:"10+ Elections" },
+  april_2026_municipal: { file:"/static/voters/april_2026_municipal.geojson", color:"#16a34a", label:"Apr. 2026 Municipal Voters" },
+  age_18_29:         { file:"/static/voters/age_18_29.geojson",         color:"#0891b2", label:"Age 18–29" },
+  age_30_44:         { file:"/static/voters/age_30_44.geojson",         color:"#2563eb", label:"Age 30–44" },
+  age_45_64:         { file:"/static/voters/age_45_64.geojson",         color:"#9333ea", label:"Age 45–64" },
+  age_65_plus:       { file:"/static/voters/age_65_plus.geojson",       color:"#dc2626", label:"Age 65+" }
 };
 
 const loadedVoterLayers = {};
@@ -224,11 +236,11 @@ function loadBase(url, style, callback) {
     .catch(err => console.warn("Could not load", url, err));
 }
 
-loadBase("static/roads.geojson", {
+loadBase("/static/roads.geojson", {
   style: { color: "#555", weight: window.innerWidth <= 700 ? 1.6 : 1.2 }
 }, layer => roadsLayer = layer.addTo(map));
 
-fetch("static/votedistrict.geojson")
+fetch("/static/votedistrict.geojson")
   .then(r => r.ok ? r.json() : null)
   .then(data => {
     if (!data) return;
@@ -244,9 +256,9 @@ fetch("static/votedistrict.geojson")
       }
     }).addTo(map);
   })
-  .catch(err => console.warn("Could not load static/votedistrict.geojson", err));
+  .catch(err => console.warn("Could not load /static/votedistrict.geojson", err));
 
-loadBase("static/parcels.geojson", {
+loadBase("/static/parcels.geojson", {
   style: { color: "#999", weight: 0.5, fillOpacity: 0 }
 }, layer => parcelsLayer = layer);
 
