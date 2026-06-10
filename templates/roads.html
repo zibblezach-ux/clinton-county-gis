@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Clinton County — Road &amp; Bridge GIS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: Arial, sans-serif; }
+    #map { width: 100%; height: 100vh; }
+    .leaflet-control-layers { font-size: 13px; max-height: 350px; overflow-y: auto; }
+    .back-btn {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1001;
+      background: rgba(17,24,39,0.92);
+      color: #e8e4d9;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .back-btn:hover { background: rgba(30,40,60,0.98); }
+    .info-panel {
+      position: absolute;
+      top: 50px;
+      left: 10px;
+      z-index: 1000;
+      background: rgba(17,24,39,0.92);
+      color: #e8e4d9;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      max-width: 280px;
+    }
+    .info-title { font-weight: bold; font-size: 15px; margin-bottom: 4px; }
+    #status { font-size: 11px; color: #6b7a99; margin-top: 6px; }
+    .leaflet-popup-content-wrapper {
+      background: rgba(17,24,39,0.95);
+      color: #e8e4d9;
+      border-radius: 6px;
+      border: 1px solid #2d3650;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+    .leaflet-popup-tip { background: rgba(17,24,39,0.95); }
+    .leaflet-popup-content { margin: 10px 14px; font-size: 13px; line-height: 1.6; }
+    .popup-title { font-weight: bold; font-size: 14px; color: #ffffff; margin-bottom: 6px; border-bottom: 1px solid #2d3650; padding-bottom: 4px; }
+    .popup-row { display: flex; justify-content: space-between; gap: 12px; }
+    .popup-label { color: #6b7a99; }
+    .popup-value { color: #e8e4d9; text-align: right; }
+    .leaflet-popup-close-button { color: #6b7a99 !important; }
+  </style>
+</head>
+<body>
+
+<a class="back-btn" href="/">← Back</a>
+
+<div class="info-panel">
+  <div class="info-title">Road &amp; Bridge GIS</div>
+  Use the layer control (top right) to toggle layers
+  <div id="status">Loading...</div>
+</div>
+
+<div id="map"></div>
+
+<script>
+const countyBounds = L.latLngBounds(L.latLng(39.35, -94.75), L.latLng(39.85, -94.05));
+
+const map = L.map('map', {
+  maxBounds: countyBounds,
+  maxBoundsViscosity: 0.9
+}).setView([39.58, -94.40], 11);
+
+const esri = L.tileLayer(
+  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+  { maxZoom: 19, attribution: 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, USGS, Intermap, INCREMENT P, NRCan, Esri Japan, METI, Esri China (Hong Kong), Esri Korea, Esri (Thailand), NGCC, &copy; OpenStreetMap contributors' }
+).addTo(map);
+
+const osm = L.tileLayer(
+  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }
+);
+
+const satellite = L.tileLayer(
+  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  { maxZoom: 19, attribution: 'Tiles &copy; Esri &mdash; Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community' }
+);
+
+L.control.scale().addTo(map);
+
+const clintonBoundaryLayer = L.layerGroup().addTo(map);
+const modotLayer     = L.layerGroup().addTo(map);
+const countyLayer    = L.layerGroup().addTo(map);
+const municipalLayer = L.layerGroup().addTo(map);
+const muniBoundLayer = L.layerGroup().addTo(map);
+
+function label(color, text) {
+  return '<span style="display:inline-block;width:20px;height:4px;border-radius:2px;background:' + color + ';margin-right:6px;vertical-align:middle"></span>' + text;
+}
+
+const overlays = {
+  [label('#4a90d9', 'MoDOT (state highways)')]:      modotLayer,
+  [label('#5ab87a', 'Clinton County Commission')]:    countyLayer,
+  [label('#cc44cc', 'Municipal (city streets)')]:     municipalLayer,
+  [label('#a86cc1', 'City limits (boundary)')]:       muniBoundLayer
+};
+
+L.control.layers(
+  { 'ESRI Street': esri, 'OpenStreetMap': osm, 'ESRI Satellite': satellite },
+  overlays,
+  { collapsed: false }
+).addTo(map);
+
+var loaded = 0;
+var total = 5;
+
+function popupContent(props, jurisdiction) {
+  var tigerName = props.FULLNAME || '';
+  var osmName   = props.OSM_NAME || '';
+  var osmRef    = props.OSM_REF  || '';
+  var mtfcc     = props.MTFCC    || '';
+
+  var displayName = osmName || tigerName || 'Unnamed Road';
+  var secondary = [];
+  if (osmRef && osmRef !== displayName) secondary.push(osmRef);
+  if (tigerName && tigerName !== displayName && tigerName !== osmRef) secondary.push(tigerName);
+  var subName = secondary.join(' / ');
+
+  var mtfccLabels = {
+    'S1100': 'Primary Road', 'S1200': 'Secondary Road', 'S1400': 'Local Road',
+    'S1500': 'Vehicular Trail', 'S1630': 'Ramp', 'S1640': 'Service Drive',
+    'S1730': 'Alley', 'S1740': 'Private Road', 'S1780': 'Parking Lot'
+  };
+
+  var html = '<div class="popup-title">' + displayName + '</div>';
+  if (subName) html += '<div style="color:#9b97a0;font-size:11px;margin-bottom:6px">' + subName + '</div>';
+  html += '<div class="popup-row"><span class="popup-label">Maintained by</span><span class="popup-value">' + jurisdiction + '</span></div>';
+  if (mtfcc) html += '<div class="popup-row"><span class="popup-label">Road class</span><span class="popup-value">' + (mtfccLabels[mtfcc] || mtfcc) + '</span></div>';
+  return html;
+}
+
+async function loadLayer(url, target, style, jurisdiction) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const data = await response.json();
+    const count = data.features ? data.features.length : 0;
+    if (count > 0) {
+      L.geoJSON(data, {
+        style: style,
+        onEachFeature: function(feature, layer) {
+          layer.bindPopup(popupContent(feature.properties || {}, jurisdiction), { maxWidth: 260 });
+          layer.on('mouseover', function() { layer.setStyle({ weight: style.weight + 2, opacity: 1 }); });
+          layer.on('mouseout',  function() { layer.setStyle(style); });
+        }
+      }).addTo(target);
+    }
+    loaded++;
+    document.getElementById('status').textContent =
+      loaded < total ? 'Loading (' + loaded + '/' + total + ')...' : 'All layers loaded — click any road for details';
+  } catch(err) {
+    console.error(jurisdiction + ' failed:', err);
+    loaded++;
+  }
+}
+
+async function loadBoundary(url, style, target) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const data = await response.json();
+    if (data.features && data.features.length > 0) {
+      L.geoJSON(data, { style: style }).addTo(target);
+    }
+    loaded++;
+    document.getElementById('status').textContent =
+      loaded < total ? 'Loading (' + loaded + '/' + total + ')...' : 'All layers loaded — click any road for details';
+  } catch(err) {
+    console.error('Boundary failed:', err);
+    loaded++;
+  }
+}
+
+async function loadMap() {
+  await loadBoundary('/api/roads/clinton',
+    { color: '#ffffff', weight: 2.5, dashArray: '6,4', fillOpacity: 0.0 },
+    clintonBoundaryLayer);
+
+  await loadBoundary('/api/roads/muni_boundaries',
+    { color: '#a86cc1', weight: 1.5, dashArray: '5,4', fillOpacity: 0.05, fillColor: '#a86cc1' },
+    muniBoundLayer);
+
+  await loadLayer('/api/roads/modot',     modotLayer,
+    { color: '#4a90d9', weight: 4, opacity: 1 }, 'MoDOT');
+
+  await loadLayer('/api/roads/county',    countyLayer,
+    { color: '#5ab87a', weight: 2.5, opacity: 1 }, 'Clinton County Commission');
+
+  await loadLayer('/api/roads/municipal', municipalLayer,
+    { color: '#cc44cc', weight: 2.5, opacity: 1 }, 'Municipal');
+}
+
+loadMap();
+</script>
+</body>
+</html>

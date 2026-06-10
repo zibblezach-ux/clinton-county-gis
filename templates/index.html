@@ -1,892 +1,268 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Clinton County GIS</title>
-
+  <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-  <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
-
+  <title>Clinton County GIS</title>
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     html, body {
-      margin: 0;
-      padding: 0;
       height: 100%;
-      width: 100%;
       font-family: Arial, sans-serif;
+      background: #1a2535;
+      color: #e8e4d9;
+    }
+
+    header {
+      text-align: center;
+      padding: 40px 20px 20px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #ffffff;
+    }
+
+    header p {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      color: #8fa3c0;
+    }
+
+    .cards {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      padding: 40px 24px 60px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      background: #232f42;
+      border: 1px solid #2d3f58;
+      border-radius: 12px;
+      width: 280px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+      border-color: #4a7abf;
+    }
+
+    .card-visual {
+      width: 100%;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
       overflow: hidden;
     }
 
-    #map {
-      width: 100%;
-      height: 100vh;
+    /* Road GIS visual */
+    .road-visual {
+      background: #1e3a5f;
     }
 
-    .leaflet-control-layers {
-      font-size: 14px;
-      max-height: 350px;
-      overflow-y: auto;
+    /* District GIS visual */
+    .district-visual {
+      background: #1a3b2a;
     }
 
-    .city-label {
-      background: transparent;
-      border: none;
-      box-shadow: none;
-      color: #4b0082;
-      font-size: 12px;
-      font-weight: bold;
+    /* Voter GIS visual */
+    .voter-visual {
+      background: #3b1f2b;
     }
 
-    .township-label {
-      background: transparent;
-      border: none;
-      box-shadow: none;
-      color: #0033aa;
-      font-size: 11px;
-      font-weight: bold;
-      white-space: nowrap;
+    .card-body {
+      padding: 18px 20px 22px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
 
-    .school-label {
-      background: transparent;
-      border: none;
-      box-shadow: none;
-      color: #006600;
-      font-size: 14px;
-      font-weight: bold;
-      white-space: nowrap;
-      text-align: center;
-    }
-
-    .water-label {
-      background: transparent;
-      border: none;
-      box-shadow: none;
-      color: #005f87;
-      font-size: 14px;
-      font-weight: bold;
-      white-space: nowrap;
-      text-align: center;
-      width: auto !important;
-      height: auto !important;
-      line-height: 1.2;
-      text-shadow:
-        -1px -1px 0 #fff,
-         1px -1px 0 #fff,
-        -1px  1px 0 #fff,
-         1px  1px 0 #fff;
-    }
-
-    .fire-label {
-      background: transparent;
-      border: none;
-      box-shadow: none;
-      color: #cc0000;
-      font-size: 13px;
-      font-weight: bold;
-      white-space: nowrap;
-      text-align: center;
-      width: auto !important;
-      height: auto !important;
-      line-height: 1.2;
-      text-shadow:
-        -1px -1px 0 #fff,
-         1px -1px 0 #fff,
-        -1px  1px 0 #fff,
-         1px  1px 0 #fff;
-    }
-
-    .info-panel {
-      position: absolute;
-      top: 10px;
-      left: 60px;
-      z-index: 1000;
-      background: rgba(255,255,255,0.95);
-      padding: 10px 14px;
-      border-radius: 6px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.3);
-      font-size: 14px;
-      max-width: 320px;
-    }
-
-    .info-title {
-      font-weight: bold;
-      font-size: 16px;
-      margin-bottom: 6px;
-    }
-
-    .tax-popup table {
-      border-collapse: collapse;
-      width: 100%;
-      font-size: 13px;
-    }
-
-    .tax-popup th,
-    .tax-popup td {
-      border-bottom: 1px solid #ddd;
-      padding: 3px 5px;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    .tax-popup th {
-      font-weight: bold;
-      background: #f5f5f5;
-    }
-
-    .tax-total {
-      margin-top: 10px;
-      padding-top: 8px;
-      border-top: 2px solid #ccc;
-      font-size: 14px;
-    }
-
-    .parcel-popup {
-      font-size: 14px;
-      line-height: 1.4;
-      min-width: 240px;
-    }
-
-    .parcel-popup-title {
-      font-weight: bold;
-      font-size: 15px;
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
       margin-bottom: 8px;
     }
 
-    .parcel-popup-row {
-      margin-bottom: 7px;
+    .card-desc {
+      font-size: 0.82rem;
+      color: #8fa3c0;
+      line-height: 1.5;
+      flex: 1;
     }
 
-    .parcel-popup-label {
-      font-weight: bold;
+    .card-btn {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .btn-roads    { background: #2a5fa8; color: #fff; }
+    .btn-districts{ background: #1f6b3a; color: #fff; }
+    .btn-voters   { background: #8b1a3a; color: #fff; }
+
+    .card:hover .btn-roads    { background: #3a74c8; }
+    .card:hover .btn-districts{ background: #2a8a4e; }
+    .card:hover .btn-voters   { background: #b02050; }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.75rem;
+      color: #4a6080;
     }
   </style>
 </head>
-
 <body>
 
-<div class="info-panel">
-  <div class="info-title">Clinton County GIS</div>
-  Base infrastructure GIS viewer
+<header>
+  <h1>Clinton County, Missouri</h1>
+  <p>Geographic Information System — Select a viewer to get started</p>
+</header>
+
+<div class="cards">
+
+  <!-- Roads -->
+  <a class="card" href="/roads">
+    <div class="card-visual road-visual">
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" width="280" height="160">
+        <!-- Grid roads -->
+        <line x1="0" y1="40"  x2="280" y2="40"  stroke="#3a5a7a" stroke-width="1"/>
+        <line x1="0" y1="80"  x2="280" y2="80"  stroke="#3a5a7a" stroke-width="1"/>
+        <line x1="0" y1="120" x2="280" y2="120" stroke="#3a5a7a" stroke-width="1"/>
+        <line x1="56"  y1="0" x2="56"  y2="160" stroke="#3a5a7a" stroke-width="1"/>
+        <line x1="112" y1="0" x2="112" y2="160" stroke="#3a5a7a" stroke-width="1"/>
+        <line x1="168" y1="0" x2="168" y2="160" stroke="#3a5a7a" stroke-width="1"/>
+        <line x1="224" y1="0" x2="224" y2="160" stroke="#3a5a7a" stroke-width="1"/>
+        <!-- Highway -->
+        <path d="M 0 95 Q 80 85 140 80 Q 200 75 280 70" stroke="#4a90d9" stroke-width="3.5" fill="none"/>
+        <!-- County roads -->
+        <line x1="0" y1="55"  x2="280" y2="55"  stroke="#5ab87a" stroke-width="2"/>
+        <line x1="0" y1="105" x2="280" y2="105" stroke="#5ab87a" stroke-width="2"/>
+        <line x1="80"  y1="0" x2="80"  y2="160" stroke="#5ab87a" stroke-width="2"/>
+        <line x1="190" y1="0" x2="190" y2="160" stroke="#5ab87a" stroke-width="2"/>
+        <!-- Municipal -->
+        <rect x="100" y="60" width="60" height="50" stroke="#cc44cc" stroke-width="1.5" fill="none" stroke-dasharray="4,2"/>
+        <line x1="115" y1="60" x2="115" y2="110" stroke="#cc44cc" stroke-width="1" opacity="0.6"/>
+        <line x1="130" y1="60" x2="130" y2="110" stroke="#cc44cc" stroke-width="1" opacity="0.6"/>
+        <line x1="145" y1="60" x2="145" y2="110" stroke="#cc44cc" stroke-width="1" opacity="0.6"/>
+        <!-- County outline -->
+        <rect x="8" y="8" width="264" height="144" stroke="#ffffff" stroke-width="1.5" fill="none" stroke-dasharray="6,3" opacity="0.4"/>
+        <!-- Legend dots -->
+        <circle cx="20" cy="148" r="4" fill="#4a90d9"/>
+        <circle cx="60" cy="148" r="4" fill="#5ab87a"/>
+        <circle cx="100" cy="148" r="4" fill="#cc44cc"/>
+      </svg>
+    </div>
+    <div class="card-body">
+      <div class="card-title">Road &amp; Bridge GIS</div>
+      <div class="card-desc">View road jurisdiction by maintaining entity — MoDOT state highways, Clinton County Commission roads, and municipal city streets. Click any road for details.</div>
+      <div class="card-btn btn-roads">Open Viewer →</div>
+    </div>
+  </a>
+
+  <!-- Districts -->
+  <a class="card" href="/districts">
+    <div class="card-visual district-visual">
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" width="280" height="160">
+        <!-- County boundary -->
+        <rect x="10" y="10" width="260" height="140" stroke="#6dbf7e" stroke-width="2" fill="none" rx="3"/>
+        <!-- School district boundaries -->
+        <path d="M 10 70 L 140 60 L 270 70" stroke="#2a8a3a" stroke-width="2" fill="none" stroke-dasharray="7,3"/>
+        <path d="M 10 110 L 120 100 L 270 110" stroke="#2a8a3a" stroke-width="2" fill="none" stroke-dasharray="7,3"/>
+        <line x1="100" y1="10" x2="110" y2="150" stroke="#2a8a3a" stroke-width="2" stroke-dasharray="7,3"/>
+        <line x1="190" y1="10" x2="180" y2="150" stroke="#2a8a3a" stroke-width="2" stroke-dasharray="7,3"/>
+        <!-- Fire district -->
+        <path d="M 10 40 Q 70 35 140 38 Q 200 41 270 38" stroke="#cc2200" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+        <!-- Flood zone fill -->
+        <path d="M 30 115 Q 80 108 130 112 Q 160 114 200 110 L 200 145 Q 160 148 130 145 Q 80 142 30 148 Z" fill="#0088ff" fill-opacity="0.18" stroke="#0088ff" stroke-width="1"/>
+        <!-- Township grid -->
+        <line x1="10" y1="85" x2="270" y2="85" stroke="#0033aa" stroke-width="1.5" opacity="0.5"/>
+        <line x1="145" y1="10" x2="145" y2="150" stroke="#0033aa" stroke-width="1.5" opacity="0.5"/>
+        <!-- Cities -->
+        <circle cx="105" cy="55" r="5" fill="#7a00cc" stroke="#fff" stroke-width="1"/>
+        <circle cx="200" cy="90" r="4" fill="#7a00cc" stroke="#fff" stroke-width="1"/>
+        <circle cx="60" cy="100" r="3" fill="#7a00cc" stroke="#fff" stroke-width="1"/>
+        <circle cx="240" cy="45" r="3" fill="#7a00cc" stroke="#fff" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="card-body">
+      <div class="card-title">Community Districts GIS</div>
+      <div class="card-desc">Explore community infrastructure — townships, school districts, fire districts, flood zones, water districts, sales tax boundaries, and property parcels.</div>
+      <div class="card-btn btn-districts">Open Viewer →</div>
+    </div>
+  </a>
+
+  <!-- Voters -->
+  <a class="card" href="/voters">
+    <div class="card-visual voter-visual">
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" width="280" height="160">
+        <!-- Vote district boundaries -->
+        <rect x="10" y="10" width="260" height="140" stroke="#f97316" stroke-width="2" fill="#f97316" fill-opacity="0.06" rx="3"/>
+        <line x1="140" y1="10" x2="140" y2="150" stroke="#f97316" stroke-width="2"/>
+        <line x1="10"  y1="80" x2="270" y2="80"  stroke="#f97316" stroke-width="2"/>
+        <!-- Voter dots - general 2024 blue -->
+        <circle cx="35"  cy="35"  r="3" fill="#1d4ed8" fill-opacity="0.8"/>
+        <circle cx="55"  cy="28"  r="3" fill="#1d4ed8" fill-opacity="0.8"/>
+        <circle cx="48"  cy="55"  r="3" fill="#1d4ed8" fill-opacity="0.8"/>
+        <circle cx="75"  cy="42"  r="3" fill="#1d4ed8" fill-opacity="0.8"/>
+        <circle cx="90"  cy="25"  r="3" fill="#1d4ed8" fill-opacity="0.8"/>
+        <circle cx="68"  cy="65"  r="3" fill="#1d4ed8" fill-opacity="0.8"/>
+        <circle cx="110" cy="48"  r="3" fill="#1d4ed8" fill-opacity="0.8"/>
+        <circle cx="125" cy="30"  r="3" fill="#1d4ed8" fill-opacity="0.8"/>
+        <!-- Voter dots - primary red -->
+        <circle cx="165" cy="30"  r="3" fill="#b91c1c" fill-opacity="0.8"/>
+        <circle cx="185" cy="48"  r="3" fill="#b91c1c" fill-opacity="0.8"/>
+        <circle cx="210" cy="35"  r="3" fill="#b91c1c" fill-opacity="0.8"/>
+        <circle cx="230" cy="55"  r="3" fill="#b91c1c" fill-opacity="0.8"/>
+        <circle cx="255" cy="40"  r="3" fill="#b91c1c" fill-opacity="0.8"/>
+        <!-- Voter dots - age purple -->
+        <circle cx="30"  cy="105" r="3" fill="#9333ea" fill-opacity="0.8"/>
+        <circle cx="55"  cy="120" r="3" fill="#9333ea" fill-opacity="0.8"/>
+        <circle cx="80"  cy="95"  r="3" fill="#9333ea" fill-opacity="0.8"/>
+        <circle cx="100" cy="130" r="3" fill="#9333ea" fill-opacity="0.8"/>
+        <circle cx="120" cy="110" r="3" fill="#9333ea" fill-opacity="0.8"/>
+        <!-- Voter dots - never voted gray -->
+        <circle cx="165" cy="110" r="3" fill="#6b7280" fill-opacity="0.8"/>
+        <circle cx="190" cy="125" r="3" fill="#6b7280" fill-opacity="0.8"/>
+        <circle cx="220" cy="100" r="3" fill="#6b7280" fill-opacity="0.8"/>
+        <circle cx="245" cy="130" r="3" fill="#6b7280" fill-opacity="0.8"/>
+        <circle cx="260" cy="112" r="3" fill="#6b7280" fill-opacity="0.8"/>
+        <!-- District labels -->
+        <text x="75"  y="145" font-size="9" fill="#f97316" opacity="0.7" text-anchor="middle">District 1-3</text>
+        <text x="205" y="145" font-size="9" fill="#f97316" opacity="0.7" text-anchor="middle">District 4-6</text>
+      </svg>
+    </div>
+    <div class="card-body">
+      <div class="card-title">Voter GIS</div>
+      <div class="card-desc">Map registered voters by election participation, age group, and voting district. Voter layers load on demand. Click any dot to view the Voter ID.</div>
+      <div class="card-btn btn-voters">Open Viewer →</div>
+    </div>
+  </a>
+
 </div>
 
-<div id="map"></div>
-
-<script>
-
-const MISSOURI_STATE_RATE = 4.225;
-
-const countyBounds = [
-  [39.15, -95.05],
-  [39.95, -93.85]
-];
-
-const map = L.map('map', {
-  maxBounds: countyBounds,
-  maxBoundsViscosity: 0.45,
-  preferCanvas: true
-});
-
-map.setView([39.58, -94.50], 10.75);
-
-const osm = L.tileLayer(
-  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors'
-  }
-).addTo(map);
-
-L.control.scale().addTo(map);
-
-L.Control.geocoder({
-  defaultMarkGeocode: true
-}).addTo(map);
-
-const roadsLayer = L.layerGroup().addTo(map);
-const citiesLayer = L.layerGroup();
-const townshipsLayer = L.layerGroup();
-const floodLayer = L.layerGroup();
-const schoolLayer = L.layerGroup();
-const parcelsLayer = L.layerGroup();
-const fireLayer = L.layerGroup();
-
-const salesTaxLayer = L.layerGroup();
-const waterLayer = L.layerGroup();
-
-let salesTaxFeatures = [];
-let parcelGeoJsonLayer = null;
-
-const overlays = {
-  "Roads": roadsLayer,
-  "Cities": citiesLayer,
-  "Townships": townshipsLayer,
-  "Flood Zones": floodLayer,
-  "School Districts": schoolLayer,
-  "Parcels": parcelsLayer,
-  "Sales Tax": salesTaxLayer,
-  "Water Districts": waterLayer,
-  "Fire Districts": fireLayer
-};
-
-L.control.layers(
-  { "OpenStreetMap": osm },
-  overlays,
-  { collapsed: false }
-).addTo(map);
-
-async function loadLayer(url, target, options, label) {
-
-  try {
-
-    console.log("Loading:", url);
-
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    console.log(label, "loaded");
-
-    const geo = L.geoJSON(data, options);
-
-    geo.addTo(target);
-
-    return geo;
-
-  } catch (err) {
-
-    console.error(label + " failed:", err);
-    return null;
-
-  }
-
-}
-
-function pointOnFeatureLatLng(feature) {
-
-  try {
-
-    const point = turf.pointOnFeature(feature);
-
-    return [
-      point.geometry.coordinates[1],
-      point.geometry.coordinates[0]
-    ];
-
-  } catch (err) {
-
-    return null;
-
-  }
-
-}
-
-function escapeHtml(value) {
-
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-
-}
-
-function formatRate(value) {
-
-  if (value === null || value === undefined || value === "") {
-    return "0";
-  }
-
-  const number = Number(value);
-
-  if (Number.isNaN(number)) {
-    return escapeHtml(value);
-  }
-
-  return number.toFixed(3);
-
-}
-
-function getFirstProperty(props, keys) {
-
-  for (const key of keys) {
-
-    if (
-      props[key] !== undefined &&
-      props[key] !== null &&
-      String(props[key]).trim() !== ""
-    ) {
-
-      return props[key];
-
-    }
-
-  }
-
-  return "";
-
-}
-
-function parcelPopupHtml(feature) {
-
-  const props = feature.properties || {};
-
-  const parcelNumber = getFirstProperty(props, [
-    "parcel_num",
-    "parcel_number",
-    "PARCEL_NUM",
-    "PARCEL_NUMBER"
-  ]);
-
-  const deedholder = getFirstProperty(props, [
-    "deedholder",
-    "DEEDHOLDER"
-  ]);
-
-  const acreage = getFirstProperty(props, [
-    "deeded_acr",
-    "DEEDED_ACR",
-    "acreage",
-    "ACRES"
-  ]);
-
-  let html = `
-    <div class="parcel-popup">
-      <div class="parcel-popup-title">Parcel Information</div>
-  `;
-
-  if (parcelNumber) {
-    html += `
-      <div class="parcel-popup-row">
-        <span class="parcel-popup-label">Parcel Number:</span><br>
-        ${escapeHtml(parcelNumber)}
-      </div>
-    `;
-  }
-
-  if (deedholder) {
-    html += `
-      <div class="parcel-popup-row">
-        <span class="parcel-popup-label">Deedholder:</span><br>
-        ${escapeHtml(deedholder)}
-      </div>
-    `;
-  }
-
-  if (acreage) {
-    html += `
-      <div class="parcel-popup-row">
-        <span class="parcel-popup-label">Deeded Acres:</span><br>
-        ${escapeHtml(acreage)}
-      </div>
-    `;
-  }
-
-  if (!parcelNumber && !deedholder && !acreage) {
-
-    html += `
-      <div class="parcel-popup-row">
-        No parcel attribute data found for this feature.
-      </div>
-    `;
-
-  }
-
-  html += `</div>`;
-
-  return html;
-
-}
-
-function salesTaxPopupHtml(matches) {
-
-  if (!matches.length) {
-    return "<b>No sales tax polygon found at this point.</b>";
-  }
-
-  const uniqueMatches = [];
-  const seen = new Set();
-
-  matches.forEach(feature => {
-
-    const p = feature.properties || {};
-
-    const key = [
-      p.JURISDICTION_NAME || "",
-      p.JURISDICTION_TYPE || "",
-      p.SALES_TAX || ""
-    ].join("|");
-
-    if (!seen.has(key)) {
-      seen.add(key);
-      uniqueMatches.push(feature);
-    }
-
-  });
-
-  const rows = uniqueMatches.map(feature => {
-
-    const p = feature.properties || {};
-
-    const name = escapeHtml(p.JURISDICTION_NAME || "Unnamed");
-    const type = escapeHtml(p.JURISDICTION_TYPE || "");
-    const sales = Number(p.SALES_TAX || 0);
-
-    return `
-      <tr>
-        <td>${name}</td>
-        <td>${type}</td>
-        <td>${formatRate(sales)}%</td>
-      </tr>
-    `;
-
-  }).join("");
-
-  const localTotal = uniqueMatches.reduce((sum, feature) => {
-
-    const value = Number(feature.properties?.SALES_TAX || 0);
-
-    return sum + (Number.isNaN(value) ? 0 : value);
-
-  }, 0);
-
-  const combinedTotal = MISSOURI_STATE_RATE + localTotal;
-
-  return `
-    <div class="tax-popup">
-
-      <b>Sales tax jurisdictions at this point</b>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Jurisdiction</th>
-            <th>Type</th>
-            <th>Rate</th>
-          </tr>
-        </thead>
-
-        <tbody>
-
-          <tr>
-            <td>Missouri State</td>
-            <td>STATE</td>
-            <td>${formatRate(MISSOURI_STATE_RATE)}%</td>
-          </tr>
-
-          ${rows}
-
-        </tbody>
-      </table>
-
-      <div class="tax-total">
-        <b>Missouri State:</b>
-        ${formatRate(MISSOURI_STATE_RATE)}%<br>
-
-        <b>Local Add-ons:</b>
-        ${formatRate(localTotal)}%<br>
-
-        <b>Combined Total:</b>
-        ${formatRate(combinedTotal)}%
-      </div>
-
-    </div>
-  `;
-}
-
-function handleSalesTaxMapClick(e) {
-
-  if (!map.hasLayer(salesTaxLayer)) {
-    return;
-  }
-
-  const clickPoint = turf.point([
-    e.latlng.lng,
-    e.latlng.lat
-  ]);
-
-  const matches = [];
-
-  for (const featureObj of salesTaxFeatures) {
-
-    try {
-
-      if (
-        featureObj &&
-        turf.booleanPointInPolygon(
-          clickPoint,
-          featureObj
-        )
-      ) {
-
-        matches.push(featureObj);
-
-      }
-
-    } catch(err) {}
-
-  }
-
-  map.closePopup();
-
-  L.popup()
-    .setLatLng(e.latlng)
-    .setContent(salesTaxPopupHtml(matches))
-    .openOn(map);
-
-}
-
-async function loadParcels() {
-
-  if (parcelGeoJsonLayer) {
-    parcelsLayer.removeLayer(parcelGeoJsonLayer);
-  }
-
-  parcelGeoJsonLayer = await loadLayer(
-    './static/Parcels/parcels.geojson',
-    parcelsLayer,
-    {
-      renderer: L.canvas(),
-
-      style: {
-        color: '#444444',
-        weight: 0.35,
-        opacity: 0.45,
-        fillColor: '#cccccc',
-        fillOpacity: 0.02
-      },
-
-      onEachFeature: function(feature, layer) {
-
-        layer.on('click', function(e) {
-
-          L.popup()
-            .setLatLng(e.latlng)
-            .setContent(parcelPopupHtml(feature))
-            .openOn(map);
-
-        });
-
-      }
-    },
-    'Parcels'
-  );
-
-}
-
-async function loadMap() {
-
-  await loadLayer(
-    './static/Roads/roads.geojson',
-    roadsLayer,
-    {
-      renderer: L.canvas(),
-
-      style: {
-        color: '#666666',
-        weight: 0.7,
-        opacity: 0.35,
-        dashArray: '3,3'
-      }
-    },
-    'Roads'
-  );
-
-  await loadLayer(
-    './static/Cities/cities.geojson',
-    citiesLayer,
-    {
-      pointToLayer: (f, latlng) =>
-        L.circleMarker(latlng, {
-          radius: 5,
-          fillColor: '#7a00cc',
-          color: '#000',
-          weight: 1,
-          fillOpacity: 0.85
-        }),
-
-      onEachFeature: (f, layer) => {
-
-        if (f.properties?.NAME) {
-
-          layer.bindTooltip(f.properties.NAME, {
-            permanent: true,
-            className: 'city-label'
-          });
-
-        }
-
-      }
-    },
-    'Cities'
-  );
-
-  await loadLayer(
-    './static/Townships/townships.geojson',
-    townshipsLayer,
-    {
-      renderer: L.canvas(),
-
-      style: {
-        color: '#0044ff',
-        weight: 3,
-        opacity: 1,
-        fillOpacity: 0
-      },
-
-      onEachFeature: function(feature, layer) {
-
-        const name =
-          feature.properties?.NAME ||
-          feature.properties?.NAMELSAD ||
-          "Township";
-
-        layer.bindTooltip(name, {
-          permanent: true,
-          direction: 'center',
-          className: 'township-label'
-        });
-
-      }
-    },
-    'Townships'
-  );
-
-  await loadLayer(
-    './static/Floodzones/floodzones.geojson',
-    floodLayer,
-    {
-      renderer: L.canvas(),
-
-      style: {
-        color: '#0088ff',
-        weight: 1,
-        opacity: 0.7,
-        fillOpacity: 0
-      }
-    },
-    'Flood'
-  );
-
-  await loadLayer(
-    './static/school_districts/school_districts.geojson',
-    schoolLayer,
-    {
-      renderer: L.canvas(),
-
-      style: {
-        color: '#008800',
-        weight: 3,
-        opacity: 0.9,
-        dashArray: '8,4',
-        fillColor: '#b7e3b7',
-        fillOpacity: 0.04
-      },
-
-      onEachFeature: function(feature, layer) {
-
-        const name = feature.properties?.NAME || "";
-
-        if (name) {
-
-          let tooltipOptions = {
-            permanent: true,
-            direction: 'center',
-            className: 'school-label'
-          };
-
-          if (name.includes("Osborn")) {
-            tooltipOptions.offset = [55, 14];
-          }
-
-          layer.bindTooltip(name, tooltipOptions);
-
-        }
-
-      }
-    },
-    'Schools'
-  );
-
-  await loadParcels();
-
-  salesTaxFeatures = [];
-
-  map.on('overlayremove', function(e) {
-
-    if (e.layer === salesTaxLayer) {
-      map.closePopup();
-    }
-
-    if (e.layer === parcelsLayer) {
-
-      map.closePopup();
-
-      if (parcelGeoJsonLayer) {
-        parcelsLayer.removeLayer(parcelGeoJsonLayer);
-      }
-
-    }
-
-  });
-
-  map.on('overlayadd', async function(e) {
-
-    if (e.layer === parcelsLayer) {
-      await loadParcels();
-    }
-
-  });
-
-  map.off('click', handleSalesTaxMapClick);
-  map.on('click', handleSalesTaxMapClick);
-
-  await loadLayer(
-    './static/Sales_tax/sales_tax.geojson',
-    salesTaxLayer,
-    {
-      renderer: L.canvas(),
-
-      style: {
-        color: '#ff8800',
-        weight: 2,
-        opacity: 1,
-        fillColor: '#ffaa33',
-        fillOpacity: 0.08
-      },
-
-      onEachFeature: function(feature, layer) {
-
-        salesTaxFeatures.push(feature);
-
-      }
-    },
-    'Sales Tax'
-  );
-
-  await loadLayer(
-    './static/Water/water.geojson',
-    waterLayer,
-    {
-      renderer: L.canvas(),
-
-      style: {
-        color: '#006699',
-        weight: 2,
-        opacity: 1,
-        fillOpacity: 0
-      },
-
-      onEachFeature: function(feature, layer) {
-
-        const name =
-          feature.properties?.PWSSNAME ||
-          "Water District";
-
-        const labelLatLng = pointOnFeatureLatLng(feature);
-
-        if (labelLatLng) {
-
-          let adjustedLatLng = labelLatLng;
-
-          if (name.includes("DeKalb")) {
-            adjustedLatLng = [
-              labelLatLng[0] - 0.004,
-              labelLatLng[1] - 0.006
-            ];
-          }
-
-          const label = L.marker(adjustedLatLng, {
-            interactive: false,
-            icon: L.divIcon({
-              className: 'water-label',
-              html: escapeHtml(name),
-              iconSize: null
-            })
-          });
-
-          waterLayer.addLayer(label);
-
-        }
-
-      }
-    },
-    'Water'
-  );
-
-  await loadLayer(
-    './static/Fire/fire_district_boundaries.geojson',
-    fireLayer,
-    {
-      renderer: L.canvas(),
-
-      style: {
-        color: '#cc0000',
-        weight: 3,
-        opacity: 1,
-        dashArray: '6,4',
-        fillOpacity: 0
-      },
-
-      onEachFeature: function(feature, layer) {
-
-        const props = feature.properties || {};
-
-        const name =
-          props.NAME ||
-          props.name ||
-          props.DISTRICT ||
-          props.district ||
-          props.FIRE_DIST ||
-          props.fire_dist ||
-          props.LABEL ||
-          props.label ||
-          props.FDNAME ||
-          props.fdname ||
-          props.AGENCY ||
-          props.agency ||
-          "Unnamed Fire District";
-
-        const labelLatLng = pointOnFeatureLatLng(feature);
-
-        if (labelLatLng) {
-
-          const label = L.marker(labelLatLng, {
-            interactive: false,
-            icon: L.divIcon({
-              className: 'fire-label',
-              html: escapeHtml(name),
-              iconSize: null
-            })
-          });
-
-          fireLayer.addLayer(label);
-
-        }
-
-        layer.bindPopup(`<b>${escapeHtml(name)}</b>`);
-
-      }
-    },
-    'Fire Districts'
-  );
-
-}
-
-loadMap();
-
-</script>
+<footer>Clinton County, Missouri &mdash; GIS Portal</footer>
 
 </body>
 </html>

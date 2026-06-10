@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: clinton-tax-gis
-    env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn app:app"
+    name: clinton-county-gis
+    runtime: python
+    buildCommand: pip install --upgrade pip setuptools wheel && pip install -r requirements.txt && python data_prep.py
+    startCommand: gunicorn app:app --timeout 120 --workers 2

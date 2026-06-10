@@ -1,0 +1,270 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Clinton County — Voter GIS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    html, body, #map { height: 100%; width: 100%; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; overflow: hidden; }
+    #map { position: fixed; inset: 0; z-index: 1; }
+    .back-btn {
+      display: none;
+      position: fixed; top: 10px; right: 10px; z-index: 2000;
+      background: white; border: 1px solid #ccc; border-radius: 8px;
+      padding: 8px 14px; font-size: 13px; font-weight: 700;
+      box-shadow: 0 2px 10px rgba(0,0,0,.25);
+      text-decoration: none; color: #222;
+    }
+    .mobile-layer-button {
+      display: none; position: fixed; top: 10px; left: 10px; z-index: 2000;
+      background: white; border: 1px solid #ccc; border-radius: 8px;
+      padding: 10px 14px; font-size: 15px; font-weight: 700;
+      box-shadow: 0 2px 10px rgba(0,0,0,.25);
+    }
+    .panel {
+      position: absolute; z-index: 1000; top: 12px; left: 12px;
+      width: 345px; max-height: calc(100vh - 24px); overflow: auto;
+      background: white; border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.28); padding: 14px;
+    }
+    .panel h2 { margin: 0 0 7px; font-size: 18px; }
+    .panel h3 { margin: 14px 0 6px; font-size: 14px; border-top: 1px solid #ddd; padding-top: 10px; }
+    .back-link { display: block; font-size: 12px; color: #2a5fa8; text-decoration: none; margin-bottom: 10px; }
+    .back-link:hover { text-decoration: underline; }
+    label { display: block; font-size: 13px; margin: 6px 0; cursor: pointer; }
+    label input { transform: scale(1.1); margin-right: 6px; }
+    .small { font-size: 12px; color: #555; line-height: 1.35; }
+    .status { margin-top: 10px; padding: 8px; background: #f3f4f6; border-radius: 6px; font-size: 12px; }
+    .legend-dot { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+    .leaflet-popup-content { font-size: 13px; line-height: 1.35; }
+    .vote-district-label { background: transparent; border: none; box-shadow: none; color: #111; font-size: 12px; font-weight: normal; text-align: center; text-shadow: 0 1px 2px white, 0 -1px 2px white, 1px 0 2px white, -1px 0 2px white; }
+    .voter-id-label { background: white; border: 1px solid #333; color: #111; font-weight: 700; font-size: 11px; padding: 2px 4px; border-radius: 3px; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+    .panel-close { display: none; }
+    @media (max-width: 700px) {
+      .mobile-layer-button { display: block; }
+      .back-btn { display: block; }
+      .panel {
+        position: fixed; top: 0; left: 0; right: 0; width: auto;
+        max-height: 75vh; border-radius: 0 0 12px 12px; padding: 14px;
+        transform: translateY(-110%); transition: transform .2s ease; z-index: 3000;
+      }
+      .panel.open { transform: translateY(0); }
+      .panel-close { display: block; float: right; background: #111; color: white; border: none; border-radius: 6px; padding: 6px 10px; font-size: 13px; font-weight: 700; }
+      .panel h2 { font-size: 17px; padding-right: 70px; }
+      label { font-size: 15px; margin: 11px 0; }
+      label input { transform: scale(1.35); margin-right: 10px; }
+      .leaflet-control-zoom { margin-top: 60px !important; }
+    }
+    @media (min-width: 701px) {
+      .back-btn-desktop {
+        position: absolute; top: 12px; left: 370px; z-index: 1000;
+        background: white; border: 1px solid #ccc; border-radius: 8px;
+        padding: 8px 14px; font-size: 13px; font-weight: 700;
+        box-shadow: 0 2px 10px rgba(0,0,0,.25);
+        text-decoration: none; color: #222;
+      }
+      .back-btn-desktop:hover { background: #f0f0f0; }
+    }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+
+<button class="mobile-layer-button" id="openLayersBtn">Layers</button>
+<a class="back-btn" href="/">← Back</a>
+<a class="back-btn-desktop" href="/">← Back to GIS Portal</a>
+
+<div class="panel" id="layerPanel">
+  <button class="panel-close" id="closeLayersBtn">Close</button>
+  <a class="back-link" href="/">← Back to GIS Portal</a>
+  <h2>Clinton County Voter GIS</h2>
+  <div class="small">Voter names excluded. Voter points use Census-geocoded residential addresses. Voter layers load only when selected.</div>
+  <h3>Base Layers</h3>
+  <label><input type="checkbox" id="roadsToggle" checked> Roads</label>
+  <label><input type="checkbox" id="voteDistrictToggle" checked> Vote District</label>
+  <label><input type="checkbox" id="parcelsToggle"> Parcels</label>
+  <h3>Election Participation</h3>
+  <label><input type="checkbox" class="voterLayer" data-layer="primary_2024"> <span class="legend-dot" style="background:#b91c1c"></span>Aug. 2024 Primary Voters</label>
+  <label><input type="checkbox" class="voterLayer" data-layer="general_2024"> <span class="legend-dot" style="background:#1d4ed8"></span>Nov. 2024 General Voters</label>
+  <h3>Habitual Voter Base</h3>
+  <label><input type="checkbox" class="voterLayer" data-layer="never_voted"> <span class="legend-dot" style="background:#6b7280"></span>Never Voted</label>
+  <label><input type="checkbox" class="voterLayer" data-layer="elections_1_2"> <span class="legend-dot" style="background:#a16207"></span>1–2 Elections</label>
+  <label><input type="checkbox" class="voterLayer" data-layer="elections_3_5"> <span class="legend-dot" style="background:#047857"></span>3–5 Elections</label>
+  <label><input type="checkbox" class="voterLayer" data-layer="elections_6_9"> <span class="legend-dot" style="background:#7c3aed"></span>6–9 Elections</label>
+  <label><input type="checkbox" class="voterLayer" data-layer="elections_10_plus"> <span class="legend-dot" style="background:#be123c"></span>10+ Elections</label>
+  <h3>Age Buckets</h3>
+  <label><input type="checkbox" class="voterLayer" data-layer="age_18_29"> <span class="legend-dot" style="background:#0891b2"></span>Age 18–29</label>
+  <label><input type="checkbox" class="voterLayer" data-layer="age_30_44"> <span class="legend-dot" style="background:#2563eb"></span>Age 30–44</label>
+  <label><input type="checkbox" class="voterLayer" data-layer="age_45_64"> <span class="legend-dot" style="background:#9333ea"></span>Age 45–64</label>
+  <label><input type="checkbox" class="voterLayer" data-layer="age_65_plus"> <span class="legend-dot" style="background:#dc2626"></span>Age 65+</label>
+  <div class="status" id="statusBox">No voter layer selected.</div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map = L.map("map", { zoomControl: true, tap: true })
+  .setView([39.60, -94.40], window.innerWidth <= 700 ? 9 : 10);
+
+L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
+  maxZoom: 19,
+  attribution: "Tiles &copy; Esri &mdash; Esri, HERE, Garmin, USGS, and the GIS User Community"
+}).addTo(map);
+
+const panel = document.getElementById("layerPanel");
+document.getElementById("openLayersBtn").addEventListener("click", () => {
+  panel.classList.add("open");
+  setTimeout(() => map.invalidateSize(), 250);
+});
+document.getElementById("closeLayersBtn").addEventListener("click", () => {
+  panel.classList.remove("open");
+  setTimeout(() => map.invalidateSize(), 250);
+});
+
+const layerInfo = {
+  primary_2024:      { file:"static/voters/primary_2024.geojson",      color:"#b91c1c", label:"Aug. 2024 Primary Voters" },
+  general_2024:      { file:"static/voters/general_2024.geojson",      color:"#1d4ed8", label:"Nov. 2024 General Voters" },
+  never_voted:       { file:"static/voters/never_voted.geojson",       color:"#6b7280", label:"Never Voted" },
+  elections_1_2:     { file:"static/voters/elections_1_2.geojson",     color:"#a16207", label:"1–2 Elections" },
+  elections_3_5:     { file:"static/voters/elections_3_5.geojson",     color:"#047857", label:"3–5 Elections" },
+  elections_6_9:     { file:"static/voters/elections_6_9.geojson",     color:"#7c3aed", label:"6–9 Elections" },
+  elections_10_plus: { file:"static/voters/elections_10_plus.geojson", color:"#be123c", label:"10+ Elections" },
+  age_18_29:         { file:"static/voters/age_18_29.geojson",         color:"#0891b2", label:"Age 18–29" },
+  age_30_44:         { file:"static/voters/age_30_44.geojson",         color:"#2563eb", label:"Age 30–44" },
+  age_45_64:         { file:"static/voters/age_45_64.geojson",         color:"#9333ea", label:"Age 45–64" },
+  age_65_plus:       { file:"static/voters/age_65_plus.geojson",       color:"#dc2626", label:"Age 65+" }
+};
+
+const loadedVoterLayers = {};
+let roadsLayer, voteDistrictLayer, parcelsLayer;
+
+function makeVoterLayer(data, color) {
+  return L.geoJSON(data, {
+    pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
+      radius: window.innerWidth <= 700 ? 4.5 : 3.5,
+      color: color, fillColor: color, fillOpacity: 0.55, weight: 1
+    }),
+    onEachFeature: (feature, layer) => {
+      const voterId = feature.properties?.voter_id || "";
+      layer._voterIdVisible = false;
+      layer.on("click", function() {
+        if (!voterId) return;
+        if (layer._voterIdVisible) {
+          layer.unbindTooltip();
+          layer._voterIdVisible = false;
+        } else {
+          layer.bindTooltip("VoterID: " + String(voterId), {
+            permanent: true, direction: "top", offset: [0, -6],
+            opacity: 0.95, className: "voter-id-label"
+          });
+          layer.openTooltip();
+          layer._voterIdVisible = true;
+        }
+      });
+    }
+  });
+}
+
+function updateStatus() {
+  const active = Object.entries(loadedVoterLayers)
+    .filter(([k, layer]) => map.hasLayer(layer))
+    .map(([k]) => layerInfo[k].label);
+  document.getElementById("statusBox").textContent =
+    active.length ? "Showing: " + active.join(", ") : "No voter layer selected.";
+}
+
+async function toggleVoterLayer(key, checked) {
+  const info = layerInfo[key];
+  if (!info) return;
+  if (checked) {
+    if (loadedVoterLayers[key]) { loadedVoterLayers[key].addTo(map); updateStatus(); return; }
+    document.getElementById("statusBox").textContent = "Loading " + info.label + "...";
+    const res = await fetch(info.file);
+    if (!res.ok) { document.getElementById("statusBox").textContent = "Failed to load " + info.file; return; }
+    const data = await res.json();
+    loadedVoterLayers[key] = makeVoterLayer(data, info.color).addTo(map);
+    updateStatus();
+    if (window.innerWidth <= 700) { panel.classList.remove("open"); setTimeout(() => map.invalidateSize(), 250); }
+  } else {
+    if (loadedVoterLayers[key]) map.removeLayer(loadedVoterLayers[key]);
+    updateStatus();
+  }
+}
+
+document.querySelectorAll(".voterLayer").forEach(cb => {
+  cb.addEventListener("change", e => toggleVoterLayer(e.target.dataset.layer, e.target.checked));
+});
+
+function fixVoteDistrict3WestEdge(data) {
+  if (!data || !Array.isArray(data.features)) return data;
+  const currentDistrict3West = -94.5706558227539;
+  const countyWestEdge = -94.60224151611328;
+  const tolerance = 0.000001;
+  function adjustCoordinates(coords) {
+    if (!Array.isArray(coords)) return;
+    if (typeof coords[0] === "number" && typeof coords[1] === "number") {
+      if (Math.abs(coords[0] - currentDistrict3West) <= tolerance) coords[0] = countyWestEdge;
+      return;
+    }
+    coords.forEach(adjustCoordinates);
+  }
+  data.features.forEach(feature => {
+    const props = feature.properties || {};
+    const isDistrict3 = props.district_id === 3 || props.district_id === "3" ||
+      props.name === "Vote District 3" || props.NAME === "Vote District 3";
+    if (isDistrict3 && feature.geometry?.coordinates) adjustCoordinates(feature.geometry.coordinates);
+  });
+  return data;
+}
+
+function loadBase(url, style, callback) {
+  fetch(url).then(r => r.ok ? r.json() : null)
+    .then(data => { if (data) callback(L.geoJSON(data, style)); })
+    .catch(err => console.warn("Could not load", url, err));
+}
+
+loadBase("static/roads.geojson", {
+  style: { color: "#555", weight: window.innerWidth <= 700 ? 1.6 : 1.2 }
+}, layer => roadsLayer = layer.addTo(map));
+
+fetch("static/votedistrict.geojson")
+  .then(r => r.ok ? r.json() : null)
+  .then(data => {
+    if (!data) return;
+    data = fixVoteDistrict3WestEdge(data);
+    voteDistrictLayer = L.geoJSON(data, {
+      style: { color: "#f97316", weight: window.innerWidth <= 700 ? 2 : 2.5, fillColor: "#f97316", fillOpacity: 0.08 },
+      onEachFeature: function(feature, layer) {
+        const props = feature.properties || {};
+        const districtNames = { 1:"Atchison-Gower", 2:"Concord-Concord", 3:"Hardin-Trimble", 4:"Jackson-Holt", 5:"Lathrop-Lathrop", 6:"Shoal-Cameron" };
+        const districtId = props.district_id || props.DISTRICT_ID || props.id || props.ID;
+        const districtName = districtNames[String(districtId)] || props.NAME || props.name || props.label || "";
+        if (districtName) layer.bindTooltip(String(districtName), { permanent: true, direction: "center", opacity: 0.95, className: "vote-district-label" });
+      }
+    }).addTo(map);
+  })
+  .catch(err => console.warn("Could not load static/votedistrict.geojson", err));
+
+loadBase("static/parcels.geojson", {
+  style: { color: "#999", weight: 0.5, fillOpacity: 0 }
+}, layer => parcelsLayer = layer);
+
+document.getElementById("roadsToggle").addEventListener("change", e => {
+  if (!roadsLayer) return;
+  e.target.checked ? roadsLayer.addTo(map) : map.removeLayer(roadsLayer);
+});
+document.getElementById("voteDistrictToggle").addEventListener("change", e => {
+  if (!voteDistrictLayer) return;
+  e.target.checked ? voteDistrictLayer.addTo(map) : map.removeLayer(voteDistrictLayer);
+});
+document.getElementById("parcelsToggle").addEventListener("change", e => {
+  if (!parcelsLayer) return;
+  e.target.checked ? parcelsLayer.addTo(map) : map.removeLayer(parcelsLayer);
+  if (window.innerWidth <= 700 && e.target.checked) { panel.classList.remove("open"); setTimeout(() => map.invalidateSize(), 250); }
+});
+
+window.addEventListener("resize", () => map.invalidateSize());
+</script>
+</body>
+</html>
