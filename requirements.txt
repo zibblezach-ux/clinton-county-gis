@@ -1,2 +1,9 @@
-flask
-gunicorn
+flask>=3.0.3
+gunicorn>=22.0.0
+geopandas>=1.0.0
+requests>=2.32.3
+shapely>=2.0.6
+pandas>=2.2.2
+pyproj>=3.7.0
+setuptools>=75.0.0
+wheel>=0.43
