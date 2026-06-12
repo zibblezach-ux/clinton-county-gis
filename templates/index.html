@@ -17,6 +17,7 @@
     .road-icon     { background: #1e3a5f; border-bottom: 1px solid #2d4f7a; }
     .district-icon { background: #1a3b2a; border-bottom: 1px solid #2a5a3a; }
     .voter-icon    { background: #2a1a2a; border-bottom: 1px solid #4a2a4a; }
+    .heat-icon     { background: #3b1a0a; border-bottom: 1px solid #6b2a0a; }
     .card-body { padding: 16px 18px 20px; flex: 1; display: flex; flex-direction: column; }
     .card-title { font-size: 1.05rem; font-weight: 700; color: #ffffff; margin-bottom: 7px; }
     .card-desc { font-size: 0.8rem; color: #8fa3c0; line-height: 1.55; flex: 1; }
@@ -24,17 +25,12 @@
     .btn-roads     { background: #2a5fa8; color: #fff; }
     .btn-districts { background: #1f6b3a; color: #fff; }
     .btn-voters    { background: #7a1a4a; color: #fff; }
+    .btn-heat      { background: #b84a0a; color: #fff; }
     .card-roads:hover     { border-color: #4a90d9; }
     .card-districts:hover { border-color: #4a9a5a; }
     .card-voters:hover    { border-color: #a83a8a; }
+    .card-heat:hover      { border-color: #e86a2a; }
     footer { text-align: center; padding: 16px; font-size: 0.72rem; color: #3a5070; }
-    @media (max-width: 640px) {
-      header { padding: 28px 16px 16px; }
-      header h1 { font-size: 1.4rem; }
-      .cards { flex-direction: column; align-items: center; padding: 16px 16px 40px; gap: 16px; }
-      .card { width: 100%; max-width: 400px; }
-      .card-icon { height: 110px; font-size: 56px; }
-    }
   </style>
 </head>
 <body>
@@ -70,6 +66,15 @@
       <div class="card-title">Voter GIS</div>
       <div class="card-desc">Map registered voters by election participation and age group across all six voting districts. Layers load on demand. Click any dot to view the Voter ID.</div>
       <div class="card-btn btn-voters">Open Viewer →</div>
+    </div>
+  </a>
+
+  <a class="card card-heat" href="/heatmap">
+    <div class="card-icon heat-icon">🔥</div>
+    <div class="card-body">
+      <div class="card-title">Property Tax Heat Map</div>
+      <div class="card-desc">2025 real estate tax revenue mapped parcel-by-parcel. Color by tax due, assessed value, property type, or delinquency. Click any parcel for full detail.</div>
+      <div class="card-btn btn-heat">Open Heat Map →</div>
     </div>
   </a>
 
