@@ -5,7 +5,6 @@ from flask import Flask, render_template, jsonify, send_from_directory, Response
 app = Flask(__name__)
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 
-# Road GIS layer map
 ROAD_LAYERS = {
     "modot":            "roads_modot.geojson",
     "psrd":             "roads_psrd.geojson",
@@ -15,8 +14,6 @@ ROAD_LAYERS = {
     "psrd_boundary":    "boundary_psrd.geojson",
     "clinton":          "clinton_boundary.geojson",
 }
-
-# ── Routes ──────────────────────────────────────────────────────────────────
 
 @app.route("/")
 def index():
@@ -34,7 +31,9 @@ def districts():
 def voters():
     return render_template("voters.html")
 
-# ── Road GIS API ─────────────────────────────────────────────────────────────
+@app.route("/heatmap")
+def heatmap():
+    return render_template("heatmap.html")
 
 @app.route("/api/roads/<layer>")
 def road_layer(layer):
@@ -51,8 +50,6 @@ def road_layer(layer):
                     break
                 yield chunk
     return Response(generate(), mimetype="application/json")
-
-# ── Static file serving ───────────────────────────────────────────────────────
 
 @app.route("/static/<path:filename>")
 def static_files(filename):
