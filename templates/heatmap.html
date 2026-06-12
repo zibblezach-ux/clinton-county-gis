@@ -109,7 +109,7 @@ const CAT_TIP={
   OT:'Parcel present in county GIS but no 2025 tax record found.'
 };
 
-const map=L.map('map',{preferCanvas:true});
+const map=L.map('map');
 map.setView([39.58,-94.50],10.75);
 const streetTile=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles © Esri'}).addTo(map);
 const satTile=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles © Esri'});
@@ -234,7 +234,7 @@ async function loadMap(){
   });
 
   parcelLayer=L.geoJSON(pData,{
-    renderer:L.canvas(),style:getStyle,
+    renderer:L.svg(),style:getStyle,
     onEachFeature(feature,layer){
       layer.on('click',e=>{
         L.popup({maxWidth:310}).setLatLng(e.latlng).setContent(buildPopup(feature.properties._pn)).openOn(map);
@@ -243,14 +243,14 @@ async function loadMap(){
     }
   }).addTo(map);
 
-  overlays.twp=L.geoJSON(tData,{renderer:L.canvas(),
+  overlays.twp=L.geoJSON(tData,{renderer:L.svg(),
     style:{color:'#ffffff',weight:2.5,opacity:0.7,fillOpacity:0},
     onEachFeature(f,layer){
       const name=f.properties?.NAME||f.properties?.NAMELSAD||'';
       if(name)layer.bindTooltip(name,{permanent:true,direction:'center',className:'township-label'});
     }
   });
-  overlays.roads=L.geoJSON(rData,{renderer:L.canvas(),style:{color:'#aaa',weight:0.9,opacity:0.45}});
+  overlays.roads=L.geoJSON(rData,{renderer:L.svg(),style:{color:'#aaa',weight:0.9,opacity:0.45}});
   overlays.cities=L.geoJSON(cData,{
     pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:5,fillColor:'#f59e0b',color:'#92400e',weight:1.5,fillOpacity:0.9}),
     onEachFeature(f,layer){
