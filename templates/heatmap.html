@@ -195,7 +195,7 @@ const CAT_TIP={
   OT:'Parcel present in county GIS but no 2025 tax record found.'
 };
 
-const map=L.map('map');
+const map=L.map('map',{preferCanvas:true});
 map.setView([39.60,-94.37],11);
 const streetTile=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles © Esri'}).addTo(map);
 const satTile=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles © Esri'});
@@ -327,7 +327,7 @@ async function loadMap(){
   });
 
   parcelLayer=L.geoJSON(pData,{
-    renderer:L.svg(),style:getStyle,
+    renderer:L.canvas(),style:getStyle,smoothFactor:0,
     onEachFeature(feature,layer){
       layer.on('click',e=>{
         L.popup({maxWidth:310}).setLatLng(e.latlng).setContent(buildPopup(feature.properties._pn)).openOn(map);
@@ -347,7 +347,7 @@ async function loadMap(){
   // Step 2: overlays in background - failures won't break the map
   try {
     const tData = await safeFetch('/static/Townships/townships.geojson');
-    overlays.twp=L.geoJSON(tData,{renderer:L.svg(),
+    overlays.twp=L.geoJSON(tData,{renderer:L.canvas(),
       style:{color:'#ffffff',weight:2.5,opacity:0.7,fillOpacity:0},
       onEachFeature(f,layer){
         const name=f.properties?.NAME||f.properties?.NAMELSAD||'';
@@ -358,7 +358,7 @@ async function loadMap(){
 
   try {
     const rData = await safeFetch('/static/Roads/roads.geojson');
-    overlays.roads=L.geoJSON(rData,{renderer:L.svg(),style:{color:'#aaa',weight:0.9,opacity:0.45}});
+    overlays.roads=L.geoJSON(rData,{renderer:L.canvas(),style:{color:'#aaa',weight:0.9,opacity:0.45}});
   } catch(e){ console.warn('Roads failed:',e.message); }
 
   try {
