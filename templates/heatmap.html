@@ -21,7 +21,7 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
 .toggle-btn{display:inline-block;padding:4px 9px;margin:0 3px 3px 0;border:1px solid rgba(255,255,255,0.12);border-radius:4px;font-size:11px;cursor:pointer;background:rgba(255,255,255,0.04);color:#b8c8d8;transition:all .15s}
 .toggle-btn.active{background:#1a4a8a;color:#fff;border-color:#3a7aca}
 .toggle-btn:hover:not(.active){background:rgba(255,255,255,0.1)}
-#legend{position:absolute;bottom:18px;right:15px;z-index:1001;padding:7px 9px;min-width:140px;max-width:175px}
+#legend{position:absolute;bottom:18px;right:10px;z-index:1001;padding:10px 12px;width:210px}
 #legend h3{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#5a8abf;margin-bottom:6px}
 .legend-bar{width:100%;height:13px;border-radius:3px;margin-bottom:4px}
 .legend-labels{display:flex;justify-content:space-between;font-size:10px;color:#888}
@@ -160,37 +160,7 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
   <p>Combined RE &amp; PP tax · click any parcel for detail</p>
 </div>
 <div id="breakdown" class="panel">
-  <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,0.08)">2025 Tax Revenue by Category</div>
-  <div style="font-size:11px;color:#7fcfff;font-weight:700;margin-bottom:10px;line-height:1.4">★ High Density Residential is Clinton County's #1 tax revenue source</div>
-  <div style="margin-bottom:8px">
-    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
-      <span style="color:#f87171;font-weight:700">High Density Res. &lt;5ac</span><span style="color:#7fcfff;font-weight:700">$12.56M</span>
-    </div>
-    <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:100%;height:100%;background:#dc2626;border-radius:3px"></div></div>
-    <div style="font-size:9px;color:#5a7a9a;margin-top:2px">6,814 parcels · avg 0.8 acres</div>
-  </div>
-  <div style="margin-bottom:8px">
-    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
-      <span style="color:#93c5fd;font-weight:700">Large Tract Res. ≥5ac</span><span style="color:#7fcfff;font-weight:700">$8.54M</span>
-    </div>
-    <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:68%;height:100%;background:#2563eb;border-radius:3px"></div></div>
-    <div style="font-size:9px;color:#5a7a9a;margin-top:2px">2,672 parcels · avg 34 acres</div>
-  </div>
-  <div style="margin-bottom:8px">
-    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
-      <span style="color:#fcd34d;font-weight:700">Commercial</span><span style="color:#7fcfff;font-weight:700">$2.31M</span>
-    </div>
-    <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:18%;height:100%;background:#d97706;border-radius:3px"></div></div>
-    <div style="font-size:9px;color:#5a7a9a;margin-top:2px">620 parcels · avg 6 acres</div>
-  </div>
-  <div style="margin-bottom:4px">
-    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
-      <span style="color:#d1d5db;font-weight:700">Agricultural Only</span><span style="color:#7fcfff;font-weight:700">$1.03M</span>
-    </div>
-    <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:8%;height:100%;background:#6b7280;border-radius:3px"></div></div>
-    <div style="font-size:9px;color:#5a7a9a;margin-top:2px">2,502 parcels · avg 61 acres</div>
-  </div>
-  <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:9px;color:#3a5a7a;line-height:1.4">Includes RE + matched PP tax. $1.83M PP from non-landowners not shown above.</div>
+  <div id="breakdown-content"></div>
 </div>
 <div id="controls" class="panel">
   <h2>⚙ Map Controls</h2>
@@ -239,10 +209,10 @@ const overlayOn={twp:false,cities:false};
 
 function colorCombined(v){
   if(!v)return'#1a1a2e';
-  if(v<250) return'#f0fdf4'; if(v<750) return'#86efac';
-  if(v<1500)return'#22c55e'; if(v<3000)return'#16a34a';
-  if(v<6000)return'#15803d'; if(v<12000)return'#166534';
-  return'#052e16';
+  if(v<250) return'#eff6ff'; if(v<750) return'#93c5fd';
+  if(v<1500)return'#3b82f6'; if(v<3000)return'#1d4ed8';
+  if(v<6000)return'#1e3a8a'; if(v<12000)return'#172554';
+  return'#0a0f2e';
 }
 function colorPerAcre(v){
   if(!v||v<1)return'#1a1a2e';
@@ -314,6 +284,118 @@ const LEGENDS={
     <div style="margin-top:5px;font-size:10px;color:#666">$798,932 outstanding as of Feb 28, 2026</div>`}
 };
 
+const BREAKDOWNS={
+  category:`
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,0.08)">2025 Tax Revenue by Category</div>
+    <div style="font-size:11px;color:#7fcfff;font-weight:700;margin-bottom:10px;line-height:1.4">★ High Density Residential is Clinton County's #1 tax revenue source</div>
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#f87171;font-weight:700">High Density Res. &lt;5ac</span><span style="color:#7fcfff;font-weight:700">$12.56M</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:100%;height:100%;background:#dc2626;border-radius:3px"></div></div>
+      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">6,814 parcels · avg 0.8 acres</div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#93c5fd;font-weight:700">Large Tract Res. ≥5ac</span><span style="color:#7fcfff;font-weight:700">$8.54M</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:68%;height:100%;background:#2563eb;border-radius:3px"></div></div>
+      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">2,672 parcels · avg 34 acres</div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#fcd34d;font-weight:700">Commercial</span><span style="color:#7fcfff;font-weight:700">$2.31M</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:18%;height:100%;background:#d97706;border-radius:3px"></div></div>
+      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">620 parcels · avg 6 acres</div>
+    </div>
+    <div style="margin-bottom:4px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#d1d5db;font-weight:700">Agricultural Only</span><span style="color:#7fcfff;font-weight:700">$1.03M</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:8%;height:100%;background:#6b7280;border-radius:3px"></div></div>
+      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">2,502 parcels · avg 61 acres</div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:9px;color:#3a5a7a;line-height:1.4">Includes RE + matched PP tax. $1.83M PP from non-landowners not shown above.</div>`,
+
+  combined:`
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,0.08)">Top 5 Highest Tax Parcels</div>
+    <div style="font-size:11px;color:#7fcfff;font-weight:700;margin-bottom:10px;line-height:1.4">★ Darkest blue parcels generate the most total tax revenue</div>
+    <div style="margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,0.06)">
+      <div style="font-size:11px;color:#fcd34d;font-weight:700">$107,172</div>
+      <div style="font-size:10px;color:#c0d0e0">09-08.2-28-000-000-012.000</div>
+      <div style="font-size:9px;color:#5a7a9a">Commercial</div>
+    </div>
+    <div style="margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,0.06)">
+      <div style="font-size:11px;color:#fcd34d;font-weight:700">$68,002</div>
+      <div style="font-size:10px;color:#c0d0e0">01-06.0-24-000-000-012.001</div>
+      <div style="font-size:9px;color:#5a7a9a">Commercial</div>
+    </div>
+    <div style="margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,0.06)">
+      <div style="font-size:11px;color:#fcd34d;font-weight:700">$65,662</div>
+      <div style="font-size:10px;color:#c0d0e0">10-02.0-09-000-000-001.000</div>
+      <div style="font-size:9px;color:#5a7a9a">Agricultural</div>
+    </div>
+    <div style="margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,0.06)">
+      <div style="font-size:11px;color:#fcd34d;font-weight:700">$53,337</div>
+      <div style="font-size:10px;color:#c0d0e0">10-07.1-25-004-014-002.001</div>
+      <div style="font-size:9px;color:#5a7a9a">High Density Residential</div>
+    </div>
+    <div style="margin-bottom:4px">
+      <div style="font-size:11px;color:#fcd34d;font-weight:700">$50,898</div>
+      <div style="font-size:10px;color:#c0d0e0">17-02.2-00-000-000-041.001</div>
+      <div style="font-size:9px;color:#5a7a9a">Commercial</div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:9px;color:#3a5a7a">Click any parcel on the map for its full detail.</div>`,
+
+  per_acre:`
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,0.08)">Tax Revenue per Acre</div>
+    <div style="font-size:11px;color:#7fcfff;font-weight:700;margin-bottom:10px;line-height:1.4">★ Small lots generate dramatically more tax per acre than large rural parcels</div>
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#f87171;font-weight:700">High Density Res.</span><span style="color:#fca5a5;font-weight:700">$2,263/ac</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:100%;height:100%;background:#ef4444;border-radius:3px"></div></div>
+      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">avg 0.8 acres per parcel</div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#fcd34d;font-weight:700">Commercial</span><span style="color:#fca5a5;font-weight:700">$617/ac</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:27%;height:100%;background:#ef4444;border-radius:3px"></div></div>
+      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">avg 6 acres per parcel</div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#93c5fd;font-weight:700">Large Tract Res.</span><span style="color:#fca5a5;font-weight:700">$94/ac</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:4%;height:100%;background:#ef4444;border-radius:3px"></div></div>
+      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">avg 34 acres per parcel</div>
+    </div>
+    <div style="margin-bottom:4px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#d1d5db;font-weight:700">Agricultural Only</span><span style="color:#fca5a5;font-weight:700">$7/ac</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:0.3%;height:100%;background:#ef4444;border-radius:3px"></div></div>
+      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">avg 61 acres per parcel</div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:9px;color:#3a5a7a;line-height:1.4">HD Residential generates 333x more tax per acre than Agricultural land.</div>`,
+
+  delinquent:`
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,0.08)">2025 Delinquency Summary</div>
+    <div style="font-size:11px;color:#f87171;font-weight:700;margin-bottom:10px;line-height:1.4">★ $798,932 outstanding as of Feb 28, 2026</div>
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#f87171;font-weight:700">High Density Res.</span><span style="color:#fca5a5;font-weight:700">545 parcels</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:100%;height:100%;background:#ef4444;border-radius:3px"></div></div>
+      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">8.0% of HD Residential parcels</div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#d1d5db;font-weight:700">Agricultural Only</span><span style="color:#fca5a5;font-weight:700">64 parcels</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:12%;height:100%;background:#ef4444;border-radius:3px"></div></div>
+      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">2.6% of Agricultural parcels</div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#93c5fd;font-weight:700">Large Tract Res.</span><span style="color:#fca5a5;font-weight:700">61 parcels</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:11%;height:100%;background:#ef4444;border-radius:3px"></div></div>
+      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">2.3% of Large Tract parcels</div>
+    </div>
+    <div style="margin-bottom:4px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#fcd34d;font-weight:700">Commercial</span><span style="color:#fca5a5;font-weight:700">35 parcels</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:6%;height:100%;background:#ef4444;border-radius:3px"></div></div>
+      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">5.6% of Commercial parcels</div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:9px;color:#3a5a7a;line-height:1.4">Total 1,343 parcels delinquent across all years. Oldest delinquencies date to 2017.</div>`
+};
+
+function updateBreakdown(mode){
+  const el = document.getElementById('breakdown-content');
+  if(el) el.innerHTML = BREAKDOWNS[mode] || '';
+}
+
 function updateLegend(mode){
   document.getElementById('leg-title').textContent=LEGENDS[mode].title;
   document.getElementById('leg-body').innerHTML=LEGENDS[mode].html+`<div style="margin-top:9px;padding-top:7px;border-top:1px solid rgba(255,255,255,0.1);font-size:10px;color:#4a6a8a;line-height:1.5">      <b style="color:#5a8abf">PP coverage: 71.9%</b>      <span class="info-icon">ⓘ<span class="tip" style="left:auto;right:18px">71.9% of total PP tax ($4.67M of $6.49M) was matched to a RE parcel by name + tax code. Each PP account assigned to owner\\'s primary parcel only — no double counting. Remaining $1.83M belongs to renters and non-landowners.</span></span><br>      Clinton County\\'s full 2025 tax levy of ~$26.3M is completely accounted for — $24.4M mapped to parcels, $1.83M identified as PP tax from non-landowners who rent or hold no real estate in the county.    </div>`; 
@@ -323,6 +405,7 @@ function setMode(btn){
   document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   updateLegend(currentMode);
+  updateBreakdown(currentMode);
   if(parcelLayer)parcelLayer.setStyle(getStyle);
 }
 
@@ -371,6 +454,7 @@ async function loadMap(){
   // Show map immediately - don't wait for overlays
   document.getElementById('loading').style.display='none';
   updateLegend('category');
+  updateBreakdown('category');
   setTimeout(function(){
     map.invalidateSize();
     try{ map.fitBounds(parcelLayer.getBounds(),{padding:[30,30]}); }catch(e){}
