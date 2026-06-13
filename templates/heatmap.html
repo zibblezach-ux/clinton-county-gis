@@ -436,14 +436,14 @@ async function safeFetch(url){
 async function loadMap(){
   // Step 0: load tax lookup data
   setLoading('Loading tax data…');
-  const taxData = await safeFetch('/api/tax?v=20260613b');
+  const taxData = await safeFetch('/api/tax?v=20260613d');
   Object.assign(TAX, taxData);
   const delinqCount = Object.values(TAX).filter(v=>v[8]===1).length;
   console.log('TAX loaded:', Object.keys(TAX).length, 'parcels,', delinqCount, 'delinquent');
 
   // Step 1: parcels
   setLoading('Loading parcels…');
-  const pData = await safeFetch('/static/Parcels/parcels.geojson?v=20260613b');
+  const pData = await safeFetch('/static/Parcels/parcels.geojson?v=20260613d');
 
   setLoading('Rendering '+pData.features.length.toLocaleString()+' parcels…');
   pData.features.forEach(f=>{
