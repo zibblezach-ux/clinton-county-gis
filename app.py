@@ -35,6 +35,20 @@ def voters():
 def heatmap():
     return render_template("heatmap.html")
 
+@app.route("/api/tax")
+def tax_data():
+    import json
+    filepath = os.path.join(STATIC_DIR, "data", "tax_2025.json")
+    def generate():
+        with open(filepath, "rb") as f:
+            while True:
+                chunk = f.read(65536)
+                if not chunk:
+                    break
+                yield chunk
+    return Response(generate(), mimetype="application/json",
+                   headers={"Cache-Control": "public, max-age=86400"})
+
 @app.route("/api/roads/<layer>")
 def road_layer(layer):
     if layer not in ROAD_LAYERS:
