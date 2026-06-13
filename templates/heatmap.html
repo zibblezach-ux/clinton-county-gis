@@ -168,7 +168,7 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
     <button class="mode-btn active" data-mode="category"   onclick="setMode(this)">🏷 Property Category</button>
     <button class="mode-btn"        data-mode="combined"   onclick="setMode(this)">💰 Total Tax Revenue</button>
     <button class="mode-btn"        data-mode="per_acre"   onclick="setMode(this)">📐 Tax per Acre</button>
-    <button class="mode-btn"        data-mode="delinquent" onclick="setMode(this)">⚠️ Delinquency</button>
+
   </div>
 
   <div class="ctrl-section">
@@ -216,7 +216,7 @@ function colorCombined(v){
   return'#0a0f2e';
 }
 function colorPerAcre(v){
-  if(!v||v<1)return'#1a1a2e';
+  if(!v||v<1)return'#e8e8e8';
   if(v<100) return'#fff1f2'; if(v<500) return'#fca5a5';
   if(v<1500)return'#ef4444'; if(v<5000)return'#b91c1c';
   return'#7f1d1d';
@@ -231,11 +231,8 @@ function getStyle(feature){
       if(d[F.T5]){fill=TOP5_COLORS[d[F.T5]];op=0.95;}
       else{fill=colorCombined(d[F.TOT]);op=0.82;}
     }
-    else if(currentMode==='per_acre'){fill=colorPerAcre(d[F.PA]);op=0.82;}
-    else if(currentMode==='delinquent'){
-      if(d[F.DEL]){fill='#ef4444';op=0.90;stroke='#dc2626';sw=0.8;}
-      else{fill='#064e3b';op=0.25;}
-    }
+    else if(currentMode==='per_acre'){fill=colorPerAcre(d[F.PA]);op=(d[F.PA]<1)?0.4:0.82;}
+
   }
   // Top5 parcels get thick white border in combined mode
   if(currentMode==='combined' && d && d[F.T5]){stroke='#ffffff';sw=2.5;}
@@ -282,14 +279,10 @@ const LEGENDS={
     <div class="legend-labels"><span>$0</span><span>$750</span><span>$3K</span><span>$6K</span><span>$12K+</span></div>
     <div style="margin-top:6px;font-size:10px;color:#666">RE tax + matched PP tax per parcel</div>`},
   per_acre:{title:'Combined Tax per Acre',html:`
-    <div class="legend-bar" style="background:linear-gradient(to right,#f0f9ff,#7dd3fc,#0284c7,#075985,#0c4a6e)"></div>
+    <div class="legend-bar" style="background:linear-gradient(to right,#fff1f2,#fca5a5,#ef4444,#b91c1c,#7f1d1d)"></div>
     <div class="legend-labels"><span>$100</span><span>$500</span><span>$1.5K</span><span>$5K+</span></div>
-    <div style="margin-top:5px;font-size:10px;color:#666">Small residential lots will be brightest — high revenue per acre vs. large rural parcels</div>`},
-  delinquent:{title:'Delinquency 2025',html:`
-    <div class="leg-item"><div class="leg-swatch" style="background:#ef4444"></div>Delinquent (699 parcels)</div>
-    <div class="leg-item"><div class="leg-swatch" style="background:#064e3b"></div>Current / No record</div>
-    <div style="margin-top:5px;font-size:10px;color:#666">$798,932 outstanding as of Feb 28, 2026</div>`}
-};
+    <div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:10px;color:#888"><div style="width:12px;height:12px;background:#e8e8e8;border-radius:2px;border:1px solid #ccc;flex-shrink:0"></div>No acreage data</div>
+    <div style="margin-top:4px;font-size:10px;color:#666">Small residential lots brightest — high revenue per acre vs. large rural parcels</div>`},
 
 const BREAKDOWNS={
   category:`
@@ -372,31 +365,6 @@ const BREAKDOWNS={
     </div>
     <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:9px;color:#3a5a7a;line-height:1.4">HD Residential generates 333x more tax per acre than Agricultural land.</div>`,
 
-  delinquent:`
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,0.08)">2025 Delinquency Summary</div>
-    <div style="font-size:11px;color:#f87171;font-weight:700;margin-bottom:10px;line-height:1.4">★ $798,932 outstanding as of Feb 28, 2026</div>
-    <div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#f87171;font-weight:700">High Density Res.</span><span style="color:#fca5a5;font-weight:700">545 parcels</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:100%;height:100%;background:#ef4444;border-radius:3px"></div></div>
-      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">8.0% of HD Residential parcels</div>
-    </div>
-    <div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#d1d5db;font-weight:700">Agricultural Only</span><span style="color:#fca5a5;font-weight:700">64 parcels</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:12%;height:100%;background:#ef4444;border-radius:3px"></div></div>
-      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">2.6% of Agricultural parcels</div>
-    </div>
-    <div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#93c5fd;font-weight:700">Large Tract Res.</span><span style="color:#fca5a5;font-weight:700">61 parcels</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:11%;height:100%;background:#ef4444;border-radius:3px"></div></div>
-      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">2.3% of Large Tract parcels</div>
-    </div>
-    <div style="margin-bottom:4px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#fcd34d;font-weight:700">Commercial</span><span style="color:#fca5a5;font-weight:700">35 parcels</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:6%;height:100%;background:#ef4444;border-radius:3px"></div></div>
-      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">5.6% of Commercial parcels</div>
-    </div>
-    <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:9px;color:#3a5a7a;line-height:1.4">Total 1,343 parcels delinquent across all years. Oldest delinquencies date to 2017.</div>`
-};
 
 function updateBreakdown(mode){
   const el = document.getElementById('breakdown-content');
@@ -412,24 +380,20 @@ function showTop5Markers(){
   const markers = TOP5_MARKERS.map(t=>{
     const icon = L.divIcon({
       className:'',
-      html:`<div style="background:#dc2626;color:#fff;border:2px solid #fff;border-radius:50%;
-            width:26px;height:26px;display:flex;align-items:center;justify-content:center;
-            font-size:13px;font-weight:900;box-shadow:0 2px 6px rgba(0,0,0,0.5);
-            cursor:pointer;">${['①','②','③','④','⑤'][t.rank-1]}</div>`,
-      iconSize:[26,26],
-      iconAnchor:[13,13]
+      html:'<div style="background:#dc2626;color:#fff;border:2.5px solid #ffffff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;box-shadow:0 2px 8px rgba(0,0,0,0.6);font-family:Arial,sans-serif;line-height:1;">'+t.rank+'</div>',
+      iconSize:[28,28],
+      iconAnchor:[14,14]
     });
     const m = L.marker([t.lat,t.lng],{icon,zIndexOffset:1000});
     m.on('click',()=>{
       L.popup({maxWidth:280})
         .setLatLng([t.lat,t.lng])
-        .setContent(`<div class="px">
-          <div class="px-title">${['①','②','③','④','⑤'][t.rank-1]} Top Revenue Parcel</div>
+        .setContent('<div class="px"><div class="px-title">#'+t.rank+' Top Revenue Parcel</div>
           <table class="px-tbl">
             <tr><td>Parcel #</td><td>${t.pn}</td></tr>
             <tr><td>Category</td><td>${t.cat}</td></tr>
             <tr class="px-hi"><td><b>Total Tax 2025</b></td><td><b style="color:#b91c1c">$${t.amt.toLocaleString()}</b></td></tr>
-          </table></div>`)
+          </table></div>')
         .openOn(map);
     });
     return m;
