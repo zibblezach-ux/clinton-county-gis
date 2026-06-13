@@ -35,6 +35,8 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
 .info-icon:hover .tip{display:block}
 
 #info-bar{position:absolute;top:10px;left:10px;z-index:1001;padding:11px 15px;max-width:280px}
+#breakdown{position:absolute;top:50%;left:10px;transform:translateY(-50%);z-index:1001;padding:12px 14px;width:258px}
+#breakdown{position:absolute;top:50%;left:10px;transform:translateY(-50%);z-index:1001;padding:12px 14px;width:258px}
 #info-bar h1{font-size:14px;font-weight:700;color:#fff;margin-bottom:3px}
 #info-bar p{font-size:11px;color:#6a8aaa;line-height:1.4}
 .loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2000;background:rgba(15,22,36,0.97);padding:24px 36px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.6);text-align:center;color:#c8d8e8;font-size:14px;border:1px solid rgba(255,255,255,0.1)}
@@ -157,6 +159,39 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
   <h1>Clinton County Tax Heat Map 2025</h1>
   <p>Combined RE &amp; PP tax · click any parcel for detail</p>
 </div>
+<div id="breakdown" class="panel">
+  <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,0.08)">2025 Tax Revenue by Category</div>
+  <div style="font-size:11px;color:#7fcfff;font-weight:700;margin-bottom:10px;line-height:1.4">★ High Density Residential is Clinton County's #1 tax revenue source</div>
+  <div style="margin-bottom:8px">
+    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+      <span style="color:#f87171;font-weight:700">High Density Res. &lt;5ac</span><span style="color:#7fcfff;font-weight:700">$12.56M</span>
+    </div>
+    <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:100%;height:100%;background:#dc2626;border-radius:3px"></div></div>
+    <div style="font-size:9px;color:#5a7a9a;margin-top:2px">6,814 parcels · avg 0.8 acres</div>
+  </div>
+  <div style="margin-bottom:8px">
+    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+      <span style="color:#93c5fd;font-weight:700">Large Tract Res. ≥5ac</span><span style="color:#7fcfff;font-weight:700">$8.54M</span>
+    </div>
+    <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:68%;height:100%;background:#2563eb;border-radius:3px"></div></div>
+    <div style="font-size:9px;color:#5a7a9a;margin-top:2px">2,672 parcels · avg 34 acres</div>
+  </div>
+  <div style="margin-bottom:8px">
+    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+      <span style="color:#fcd34d;font-weight:700">Commercial</span><span style="color:#7fcfff;font-weight:700">$2.31M</span>
+    </div>
+    <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:18%;height:100%;background:#d97706;border-radius:3px"></div></div>
+    <div style="font-size:9px;color:#5a7a9a;margin-top:2px">620 parcels · avg 6 acres</div>
+  </div>
+  <div style="margin-bottom:4px">
+    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+      <span style="color:#d1d5db;font-weight:700">Agricultural Only</span><span style="color:#7fcfff;font-weight:700">$1.03M</span>
+    </div>
+    <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:8%;height:100%;background:#6b7280;border-radius:3px"></div></div>
+    <div style="font-size:9px;color:#5a7a9a;margin-top:2px">2,502 parcels · avg 61 acres</div>
+  </div>
+  <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:9px;color:#3a5a7a;line-height:1.4">Includes RE + matched PP tax. $1.83M PP from non-landowners not shown above.</div>
+</div>
 <div id="controls" class="panel">
   <h2>⚙ Map Controls</h2>
   <div class="ctrl-section">
@@ -182,7 +217,7 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
 <script>
 let TAX={};  // loaded async below
 const F={CAT:0,TC:1,TR:2,AC:3,RE:4,PP:5,TOT:6,PA:7,DEL:8,HPP:9};
-const CAT_COLOR={HD:'#2563eb',LT:'#22c55e',C:'#f59e0b',AG:'#a78bfa',OT:'#94a3b8'};
+const CAT_COLOR={HD:'#dc2626',LT:'#2563eb',C:'#d97706',AG:'#6b7280',OT:'#374151'};
 const CAT_LABEL={HD:'High Density Residential <5ac',LT:'Large Tract Residential ≥5ac',C:'Commercial',AG:'Agricultural Only',OT:'Other'};
 const CAT_TIP={
   HD:'Parcels with a residential structure on lots smaller than 5 acres. Typically in-town and suburban properties.',
@@ -260,10 +295,10 @@ function buildPopup(pn){
 
 const LEGENDS={
   category:{title:'Property Category',html:`
-    <div class="leg-item"><div class="leg-swatch" style="background:#2563eb;border-color:#1d4ed8"></div><div class="leg-text">High Density Res. &lt;5ac<span class="info-icon">ⓘ<span class="tip">Residential parcels under 5 acres. In-town and suburban properties. County's largest single tax revenue source at $12.56M combined.</span></span><div class="leg-sub">6,814 parcels · $12.56M</div></div></div>
-    <div class="leg-item"><div class="leg-swatch" style="background:#22c55e"></div><div class="leg-text">Large Tract Res. ≥5ac<span class="info-icon">ⓘ<span class="tip">Residential parcels of 5+ acres — rural homes, farmsteads with dwellings. Larger lots but still has a house assessed by the county.</span></span><div class="leg-sub">2,672 parcels · $8.54M</div></div></div>
-    <div class="leg-item"><div class="leg-swatch" style="background:#f59e0b"></div><div class="leg-text">Commercial<span class="info-icon">ⓘ<span class="tip">Any parcel with commercial assessed value — businesses, retail, industrial, rentals. Highest tax per acre of any category.</span></span><div class="leg-sub">620 parcels · $2.31M</div></div></div>
-    <div class="leg-item"><div class="leg-swatch" style="background:#a78bfa"></div><div class="leg-text">Agricultural Only<span class="info-icon">ⓘ<span class="tip">Land with ag assessed value but no residential structure — cropland, pasture, timber. The house, if any, is on a separate parcel.</span></span><div class="leg-sub">2,502 parcels · $1.03M</div></div></div>
+    <div class="leg-item"><div class="leg-swatch" style="background:#dc2626"></div><div class="leg-text">High Density Res. &lt;5ac<span class="info-icon">ⓘ<span class="tip">Residential parcels under 5 acres. In-town and suburban properties. County's largest single tax revenue source at $12.56M combined.</span></span><div class="leg-sub">6,814 parcels · $12.56M</div></div></div>
+    <div class="leg-item"><div class="leg-swatch" style="background:#2563eb"></div><div class="leg-text">Large Tract Res. ≥5ac<span class="info-icon">ⓘ<span class="tip">Residential parcels of 5+ acres — rural homes, farmsteads with dwellings. Larger lots but still has a house assessed by the county.</span></span><div class="leg-sub">2,672 parcels · $8.54M</div></div></div>
+    <div class="leg-item"><div class="leg-swatch" style="background:#d97706"></div><div class="leg-text">Commercial<span class="info-icon">ⓘ<span class="tip">Any parcel with commercial assessed value — businesses, retail, industrial, rentals. Highest tax per acre of any category.</span></span><div class="leg-sub">620 parcels · $2.31M</div></div></div>
+    <div class="leg-item"><div class="leg-swatch" style="background:#6b7280"></div><div class="leg-text">Agricultural Only<span class="info-icon">ⓘ<span class="tip">Land with ag assessed value but no residential structure — cropland, pasture, timber. The house, if any, is on a separate parcel.</span></span><div class="leg-sub">2,502 parcels · $1.03M</div></div></div>
     <div class="leg-item"><div class="leg-swatch" style="background:#1a1a2e;border-color:#555"></div><div class="leg-text" style="color:#666">No tax record</div></div>`},
   combined:{title:'Total Tax Revenue',html:`
     <div class="legend-bar" style="background:linear-gradient(to right,#ffffb2,#fecc5c,#fd8d3c,#f03b20,#bd0026,#800026,#3d0010)"></div>
