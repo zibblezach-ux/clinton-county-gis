@@ -4,8 +4,8 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clinton County — Property Tax Heat Map 2025</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLs=" crossorigin=""></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
@@ -110,7 +110,7 @@ const CAT_TIP={
 };
 
 const map=L.map('map');
-map.setView([39.65,-94.42],11);
+map.setView([39.60,-94.37],11);
 const streetTile=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles © Esri'}).addTo(map);
 const satTile=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles © Esri'});
 L.control.scale({imperial:true,metric:false}).addTo(map);
@@ -242,6 +242,8 @@ async function loadMap(){
       });
     }
   }).addTo(map);
+  // Fit map to actual parcel bounds with padding
+  try { map.fitBounds(parcelLayer.getBounds(), {padding:[20,20]}); } catch(e){}
 
   overlays.twp=L.geoJSON(tData,{renderer:L.svg(),
     style:{color:'#ffffff',weight:2.5,opacity:0.7,fillOpacity:0},
@@ -259,6 +261,7 @@ async function loadMap(){
   });
 
   document.getElementById('loading').style.display='none';
+  setTimeout(function(){ map.invalidateSize(); try{map.fitBounds(parcelLayer.getBounds(),{padding:[30,30]});}catch(e){} },150);
   updateLegend('category');
 }
 
