@@ -306,15 +306,22 @@ function toggleOverlay(k){
   if(l){overlayOn[k]?map.addLayer(l):map.removeLayer(l);}
 }
 
-async function loadMap(){
-  const [pResp,tResp,rResp,cResp]=await Promise.all([
-    fetch('/static/Parcels/parcels.geojson'),
-    fetch('/static/Townships/townships.geojson'),
-    fetch('/static/Roads/roads.geojson'),
-    fetch('/static/Cities/cities.geojson')
-  ]);
-  const [pData,tData,rData,cData]=await Promise.all([pResp.json(),tResp.json(),rResp.json(),cResp.json()]);
+function setLoading(msg){
+  document.getElementById('loading').innerHTML='<div style="font-size:22px;margin-bottom:10px">🔥</div><div>'+msg+'</div><div style="font-size:11px;color:#5a8abf;margin-top:6px">12,610 parcels · 2025 RE + PP tax</div>';
+}
 
+async function safeFetch(url){
+  const r = await fetch(url);
+  if(!r.ok) throw new Error(url+' returned HTTP '+r.status);
+  return await r.json();
+}
+
+async function loadMap(){
+  // Step 1: parcels (critical - show map as soon as this is done)
+  setLoading('Loading parcels…');
+  const pData = await safeFetch('/static/Parcels/parcels.geojson');
+
+  setLoading('Rendering '+pData.features.length.toLocaleString()+' parcels…');
   pData.features.forEach(f=>{
     f.properties._pn=f.properties.parcel_num||f.properties.parcel_number||'';
   });
@@ -328,34 +335,47 @@ async function loadMap(){
       });
     }
   }).addTo(map);
-  // Fit map to actual parcel bounds with padding
-  try { map.fitBounds(parcelLayer.getBounds(), {padding:[20,20]}); } catch(e){}
 
-  overlays.twp=L.geoJSON(tData,{renderer:L.svg(),
-    style:{color:'#ffffff',weight:2.5,opacity:0.7,fillOpacity:0},
-    onEachFeature(f,layer){
-      const name=f.properties?.NAME||f.properties?.NAMELSAD||'';
-      if(name)layer.bindTooltip(name,{permanent:true,direction:'center',className:'township-label'});
-    }
-  });
-  overlays.roads=L.geoJSON(rData,{renderer:L.svg(),style:{color:'#aaa',weight:0.9,opacity:0.45}});
-  overlays.cities=L.geoJSON(cData,{
-    pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:5,fillColor:'#f59e0b',color:'#92400e',weight:1.5,fillOpacity:0.9}),
-    onEachFeature(f,layer){
-      if(f.properties?.NAME)layer.bindTooltip(f.properties.NAME,{permanent:true,className:'city-label'});
-    }
-  });
-
+  // Show map immediately - don't wait for overlays
   document.getElementById('loading').style.display='none';
-  setTimeout(function(){ map.invalidateSize(); try{map.fitBounds(parcelLayer.getBounds(),{padding:[30,30]});}catch(e){} },150);
   updateLegend('category');
+  setTimeout(function(){
+    map.invalidateSize();
+    try{ map.fitBounds(parcelLayer.getBounds(),{padding:[30,30]}); }catch(e){}
+  },150);
+
+  // Step 2: overlays in background - failures won't break the map
+  try {
+    const tData = await safeFetch('/static/Townships/townships.geojson');
+    overlays.twp=L.geoJSON(tData,{renderer:L.svg(),
+      style:{color:'#ffffff',weight:2.5,opacity:0.7,fillOpacity:0},
+      onEachFeature(f,layer){
+        const name=f.properties?.NAME||f.properties?.NAMELSAD||'';
+        if(name)layer.bindTooltip(name,{permanent:true,direction:'center',className:'township-label'});
+      }
+    });
+  } catch(e){ console.warn('Townships failed:',e.message); }
+
+  try {
+    const rData = await safeFetch('/static/Roads/roads.geojson');
+    overlays.roads=L.geoJSON(rData,{renderer:L.svg(),style:{color:'#aaa',weight:0.9,opacity:0.45}});
+  } catch(e){ console.warn('Roads failed:',e.message); }
+
+  try {
+    const cData = await safeFetch('/static/Cities/cities.geojson');
+    overlays.cities=L.geoJSON(cData,{
+      pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:5,fillColor:'#f59e0b',color:'#92400e',weight:1.5,fillOpacity:0.9}),
+      onEachFeature(f,layer){
+        if(f.properties?.NAME)layer.bindTooltip(f.properties.NAME,{permanent:true,className:'city-label'});
+      }
+    });
+  } catch(e){ console.warn('Cities failed:',e.message); }
 }
 
 loadMap().catch(err=>{
-  document.getElementById('loading').innerHTML='<b>Error: </b>'+err.message;
-  console.error(err);
+  document.getElementById('loading').innerHTML='<div style="font-size:26px;margin-bottom:8px">⚠️</div><b style="color:#ef4444">Map failed to load</b><br><span style="font-size:11px;color:#aaa;display:block;margin:6px 0">'+err.message+'</span><button onclick="location.reload()" style="margin-top:8px;padding:8px 18px;background:#1a4a8a;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">Retry</button>';
+  console.error('loadMap error:',err);
 });
-
 // Mobile menu toggle
 function toggleMobileMenu(){
   const c=document.getElementById('controls');
