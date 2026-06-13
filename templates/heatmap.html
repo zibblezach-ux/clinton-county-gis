@@ -186,7 +186,8 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
 
 <script>
 let TAX={};  // loaded async below
-const F={CAT:0,TC:1,TR:2,AC:3,RE:4,PP:5,TOT:6,PA:7,DEL:8,HPP:9};
+const F={CAT:0,TC:1,TR:2,AC:3,RE:4,PP:5,TOT:6,PA:7,DEL:8,HPP:9,T5:10};
+const TOP5_COLORS=['','#7f1d1d','#991b1b','#b91c1c','#dc2626','#ef4444'];
 const CAT_COLOR={HD:'#dc2626',LT:'#2563eb',C:'#d97706',AG:'#6b7280',OT:'#374151'};
 const CAT_LABEL={HD:'High Density Residential <5ac',LT:'Large Tract Residential ≥5ac',C:'Commercial',AG:'Agricultural Only',OT:'Other'};
 const CAT_TIP={
@@ -226,13 +227,18 @@ function getStyle(feature){
   let fill='#1a1a2e',op=0.1,stroke='#33405a',sw=0.35;
   if(d){
     if(currentMode==='category'){fill=CAT_COLOR[d[F.CAT]]||'#94a3b8';op=0.80;}
-    else if(currentMode==='combined'){fill=colorCombined(d[F.TOT]);op=0.82;}
+    else if(currentMode==='combined'){
+      if(d[F.T5]){fill=TOP5_COLORS[d[F.T5]];op=0.95;}
+      else{fill=colorCombined(d[F.TOT]);op=0.82;}
+    }
     else if(currentMode==='per_acre'){fill=colorPerAcre(d[F.PA]);op=0.82;}
     else if(currentMode==='delinquent'){
       if(d[F.DEL]){fill='#ef4444';op=0.90;stroke='#dc2626';sw=0.8;}
       else{fill='#064e3b';op=0.25;}
     }
   }
+  // Top5 parcels get thick white border in combined mode
+  if(currentMode==='combined' && d && d[F.T5]){stroke='#ffffff';sw=2.5;}
   return{color:stroke,weight:sw,opacity:0.6,fillColor:fill,fillOpacity:op};
 }
 
@@ -242,6 +248,7 @@ function buildPopup(pn){
   const d=TAX[pn];
   if(!d) return '<div class="px"><div class="px-title">No 2025 tax record</div><small>'+pn+'</small></div>';
   let h='<div class="px"><div class="px-title">Parcel Detail — 2025</div>';
+  if(d[F.T5]) h+='<span class="px-badge" style="background:#7f1d1d;color:#fca5a5">★ #'+d[F.T5]+' Top Revenue Parcel</span><br>';
   h+='<span class="px-badge px-'+d[F.CAT]+'">'+CAT_LABEL[d[F.CAT]]+'</span>';
   if(d[F.DEL]) h+='<span class="px-badge px-delinq">⚠ Delinquent</span>';
   if(d[F.HPP]) h+='<span class="px-badge px-pp">+ PP Linked</span>';
@@ -338,7 +345,7 @@ const BREAKDOWNS={
       <div style="font-size:10px;color:#c0d0e0">17-02.2-00-000-000-041.001</div>
       <div style="font-size:9px;color:#5a7a9a">Commercial</div>
     </div>
-    <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:9px;color:#3a5a7a">Click any parcel on the map for its full detail.</div>`,
+    <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:9px;color:#3a5a7a">These 5 parcels are highlighted in red on the map with a white border. Switch to Total Tax Revenue view to see them.</div>`,
 
   per_acre:`
     <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,0.08)">Tax Revenue per Acre</div>
@@ -431,6 +438,8 @@ async function loadMap(){
   setLoading('Loading tax data…');
   const taxData = await safeFetch('/api/tax');
   Object.assign(TAX, taxData);
+  const delinqCount = Object.values(TAX).filter(v=>v[8]===1).length;
+  console.log('TAX loaded:', Object.keys(TAX).length, 'parcels,', delinqCount, 'delinquent');
 
   // Step 1: parcels
   setLoading('Loading parcels…');
