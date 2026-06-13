@@ -4,8 +4,8 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clinton County — Property Tax Heat Map 2025</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLs=" crossorigin=""></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
@@ -379,13 +379,9 @@ async function loadMap(){
 }
 
 // Defer loadMap so loading screen renders before heavy JS executes
-window.addEventListener('load', function(){
-  setTimeout(function(){
-    loadMap().catch(err=>{
-      document.getElementById('loading').innerHTML='<div style="font-size:26px;margin-bottom:8px">⚠️</div><b style="color:#ef4444">Map failed to load</b><br><span style="font-size:11px;color:#aaa;display:block;margin:6px 0">'+err.message+'</span><button onclick="location.reload()" style="margin-top:8px;padding:8px 18px;background:#1a4a8a;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">Retry</button>';
-      console.error('loadMap error:',err);
-    });
-  }, 100);
+loadMap().catch(err=>{
+  document.getElementById('loading').innerHTML='<div style="font-size:26px;margin-bottom:8px">⚠️</div><b style="color:#ef4444">Map failed to load</b><br><span style="font-size:11px;color:#aaa;display:block;margin:6px 0">'+err.message+'</span><button onclick="location.reload()" style="margin-top:8px;padding:8px 18px;background:#1a4a8a;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">Retry</button>';
+  console.error('loadMap error:',err);
 });
 // Mobile menu toggle
 function toggleMobileMenu(){
