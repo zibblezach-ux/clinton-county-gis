@@ -58,7 +58,7 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
 .px-hi td{background:#fff7ed}
 .px-hi2 td{background:#f0fdf4}
 .township-label{background:transparent;border:none;box-shadow:none;color:#fff;font-size:10px;font-weight:bold;white-space:nowrap;text-shadow:0 0 4px #000,-1px -1px 0 #000,1px 1px 0 #000}
-.city-label{background:transparent;border:none;box-shadow:none;color:#f59e0b;font-size:11px;font-weight:bold;text-shadow:0 0 3px #000,-1px -1px 0 #000,1px 1px 0 #000}
+.city-label{background:transparent;border:none;box-shadow:none;color:#000000;font-size:11px;font-weight:bold;text-shadow:none;opacity:0.7}
 
 /* ── Mobile optimization ─────────────────────────────────────────── */
 @media (max-width: 768px) {
@@ -186,7 +186,7 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
 let TAX={};  // loaded async below
 const F={CAT:0,TC:1,TR:2,AC:3,RE:4,PP:5,TOT:6,PA:7,DEL:8,HPP:9};
 
-const CAT_COLOR={HD:'#dc2626',LT:'#2563eb',C:'#d97706',AG:'#6b7280',OT:'#374151'};
+const CAT_COLOR={HD:'#dc2626',LT:'#ca8a04',C:'#ea580c',AG:'#374151',OT:'#6b7280'};
 const CAT_LABEL={HD:'High Density Residential <5ac',LT:'Large Tract Residential ≥5ac',C:'Commercial',AG:'Agricultural Only',OT:'Other'};
 const CAT_TIP={
   HD:'Parcels with a residential structure on lots smaller than 5 acres. Typically in-town and suburban properties.',
@@ -258,9 +258,9 @@ function buildPopup(pn){
 const LEGENDS={
   category:{title:'Property Category',html:`
     <div class="leg-item"><div class="leg-swatch" style="background:#dc2626"></div><div class="leg-text">High Density Res. &lt;5ac<span class="info-icon">ⓘ<span class="tip">Residential parcels under 5 acres. In-town and suburban properties. County's largest single tax revenue source at $12.56M combined.</span></span><div class="leg-sub">6,814 parcels · $12.56M</div></div></div>
-    <div class="leg-item"><div class="leg-swatch" style="background:#2563eb"></div><div class="leg-text">Large Tract Res. ≥5ac<span class="info-icon">ⓘ<span class="tip">Residential parcels of 5+ acres — rural homes, farmsteads with dwellings. Larger lots but still has a house assessed by the county.</span></span><div class="leg-sub">2,672 parcels · $8.54M</div></div></div>
-    <div class="leg-item"><div class="leg-swatch" style="background:#d97706"></div><div class="leg-text">Commercial<span class="info-icon">ⓘ<span class="tip">Any parcel with commercial assessed value — businesses, retail, industrial, rentals. Highest tax per acre of any category.</span></span><div class="leg-sub">620 parcels · $2.31M</div></div></div>
-    <div class="leg-item"><div class="leg-swatch" style="background:#6b7280"></div><div class="leg-text">Agricultural Only<span class="info-icon">ⓘ<span class="tip">Land with ag assessed value but no residential structure — cropland, pasture, timber. The house, if any, is on a separate parcel.</span></span><div class="leg-sub">2,502 parcels · $1.03M</div></div></div>
+    <div class="leg-item"><div class="leg-swatch" style="background:#ca8a04"></div><div class="leg-text">Large Tract Res. ≥5ac<span class="info-icon">ⓘ<span class="tip">Residential parcels of 5+ acres — rural homes, farmsteads with dwellings. Larger lots but still has a house assessed by the county.</span></span><div class="leg-sub">2,672 parcels · $8.54M</div></div></div>
+    <div class="leg-item"><div class="leg-swatch" style="background:#ea580c"></div><div class="leg-text">Commercial<span class="info-icon">ⓘ<span class="tip">Any parcel with commercial assessed value — businesses, retail, industrial, rentals. Highest tax per acre of any category.</span></span><div class="leg-sub">620 parcels · $2.31M</div></div></div>
+    <div class="leg-item"><div class="leg-swatch" style="background:#374151"></div><div class="leg-text">Agricultural Only<span class="info-icon">ⓘ<span class="tip">Land with ag assessed value but no residential structure — cropland, pasture, timber. The house, if any, is on a separate parcel.</span></span><div class="leg-sub">2,502 parcels · $1.03M</div></div></div>
     <div class="leg-item"><div class="leg-swatch" style="background:#1a1a2e;border-color:#555"></div><div class="leg-text" style="color:#666">No tax record</div></div>`},
   per_acre:{title:'Combined Tax per Acre',html:`
     <div class="legend-bar" style="background:linear-gradient(to right,#fff1f2,#fca5a5,#ef4444,#b91c1c,#7f1d1d)"></div>
@@ -279,18 +279,18 @@ const BREAKDOWNS={
       <div style="font-size:11px;color:#5a7a9a;margin-top:3px">6,814 parcels · avg 0.8 acres</div>
     </div>
     <div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#93c5fd;font-weight:700">Large Tract Res. ≥5ac</span><span style="color:#7fcfff;font-weight:700">$8.54M</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:68%;height:100%;background:#2563eb;border-radius:3px"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#fde68a;font-weight:700">Large Tract Res. ≥5ac</span><span style="color:#7fcfff;font-weight:700">$8.54M</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:68%;height:100%;background:#ca8a04;border-radius:3px"></div></div>
       <div style="font-size:11px;color:#5a7a9a;margin-top:3px">2,672 parcels · avg 34 acres</div>
     </div>
     <div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#fcd34d;font-weight:700">Commercial</span><span style="color:#7fcfff;font-weight:700">$2.31M</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:18%;height:100%;background:#d97706;border-radius:3px"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#fb923c;font-weight:700">Commercial</span><span style="color:#7fcfff;font-weight:700">$2.31M</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:18%;height:100%;background:#ea580c;border-radius:3px"></div></div>
       <div style="font-size:11px;color:#5a7a9a;margin-top:3px">620 parcels · avg 6 acres</div>
     </div>
     <div style="margin-bottom:4px">
       <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#d1d5db;font-weight:700">Agricultural Only</span><span style="color:#7fcfff;font-weight:700">$1.03M</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:8%;height:100%;background:#6b7280;border-radius:3px"></div></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:8%;height:100%;background:#374151;border-radius:3px"></div></div>
       <div style="font-size:11px;color:#5a7a9a;margin-top:3px">2,502 parcels · avg 61 acres</div>
     </div>
     <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:10px;color:#3a5a7a;line-height:1.5">Includes RE + matched PP tax. $1.83M PP from non-landowners not shown above.</div>`,
@@ -304,18 +304,18 @@ const BREAKDOWNS={
       <div style="font-size:11px;color:#5a7a9a;margin-top:3px">avg 0.8 acres per parcel</div>
     </div>
     <div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#fcd34d;font-weight:700">Commercial</span><span style="color:#fca5a5;font-weight:700">$617/ac</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:27%;height:100%;background:#d97706;border-radius:3px"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#fb923c;font-weight:700">Commercial</span><span style="color:#fca5a5;font-weight:700">$617/ac</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:27%;height:100%;background:#ea580c;border-radius:3px"></div></div>
       <div style="font-size:11px;color:#5a7a9a;margin-top:3px">avg 6 acres per parcel</div>
     </div>
     <div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#93c5fd;font-weight:700">Large Tract Res.</span><span style="color:#fca5a5;font-weight:700">$94/ac</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:4%;height:100%;background:#2563eb;border-radius:3px"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#fde68a;font-weight:700">Large Tract Res.</span><span style="color:#fca5a5;font-weight:700">$94/ac</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:4%;height:100%;background:#ca8a04;border-radius:3px"></div></div>
       <div style="font-size:11px;color:#5a7a9a;margin-top:3px">avg 34 acres per parcel</div>
     </div>
     <div style="margin-bottom:4px">
-      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#d1d5db;font-weight:700">Agricultural Only</span><span style="color:#fca5a5;font-weight:700">$7/ac</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:0.3%;height:100%;background:#6b7280;border-radius:3px"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#9ca3af;font-weight:700">Agricultural Only</span><span style="color:#fca5a5;font-weight:700">$7/ac</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:0.3%;height:100%;background:#374151;border-radius:3px"></div></div>
       <div style="font-size:11px;color:#5a7a9a;margin-top:3px">avg 61 acres per parcel</div>
     </div>
     <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:10px;color:#3a5a7a;line-height:1.5">HD Residential generates 333x more tax per acre than Agricultural land.</div>`
@@ -410,11 +410,12 @@ async function loadMap(){
   try {
     const cData = await safeFetch('/static/Cities/cities.geojson');
     overlays.cities=L.geoJSON(cData,{
-      pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:5,fillColor:'#f59e0b',color:'#92400e',weight:1.5,fillOpacity:0.9}),
-      onEachFeature(f,layer){
-        if(f.properties?.NAME)layer.bindTooltip(f.properties.NAME,{permanent:true,className:'city-label'});
-      }
-    });
+    renderer:L.canvas(),
+    style:{color:'#000000',weight:1.5,opacity:0.5,fillOpacity:0},
+    onEachFeature(f,layer){
+      if(f.properties?.NAME)layer.bindTooltip(f.properties.NAME,{permanent:true,className:'city-label'});
+    }
+  });
   } catch(e){ console.warn('Cities failed:',e.message); }
 }
 
