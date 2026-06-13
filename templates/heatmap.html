@@ -11,34 +11,34 @@
 html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
 #map{width:100%;height:100vh}
 .panel{background:rgba(15,22,36,0.96);border:1px solid rgba(255,255,255,0.1);border-radius:10px;box-shadow:0 3px 18px rgba(0,0,0,0.5)}
-#controls{position:absolute;top:10px;right:10px;z-index:1001;padding:14px 15px;width:280px}
-#controls h2{font-size:10px;font-weight:700;color:#5a8abf;margin-bottom:10px;letter-spacing:.09em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:7px}
+#controls{position:absolute;top:10px;right:10px;z-index:1001;padding:14px 16px;width:300px}
+#controls h2{font-size:12px;font-weight:700;color:#5a8abf;margin-bottom:12px;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:8px}
 .ctrl-section{margin-bottom:11px}
 .ctrl-section label{display:block;font-size:10px;font-weight:700;color:#5a8abf;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em}
-.mode-btn{display:block;width:100%;text-align:left;padding:7px 10px;margin-bottom:3px;border:1px solid rgba(255,255,255,0.1);border-radius:6px;font-size:12px;cursor:pointer;background:rgba(255,255,255,0.04);color:#b8c8d8;transition:all .15s}
+.mode-btn{display:block;width:100%;text-align:left;padding:8px 11px;margin-bottom:4px;border:1px solid rgba(255,255,255,0.1);border-radius:6px;font-size:13px;cursor:pointer;background:rgba(255,255,255,0.04);color:#b8c8d8;transition:all .15s}
 .mode-btn.active{background:#1a4a8a;color:#fff;border-color:#3a7aca;font-weight:700}
 .mode-btn:hover:not(.active){background:rgba(255,255,255,0.09)}
-.toggle-btn{display:inline-block;padding:4px 9px;margin:0 3px 3px 0;border:1px solid rgba(255,255,255,0.12);border-radius:4px;font-size:11px;cursor:pointer;background:rgba(255,255,255,0.04);color:#b8c8d8;transition:all .15s}
+.toggle-btn{display:inline-block;padding:5px 11px;margin:0 3px 4px 0;border:1px solid rgba(255,255,255,0.12);border-radius:4px;font-size:12px;cursor:pointer;background:rgba(255,255,255,0.04);color:#b8c8d8;transition:all .15s}
 .toggle-btn.active{background:#1a4a8a;color:#fff;border-color:#3a7aca}
 .toggle-btn:hover:not(.active){background:rgba(255,255,255,0.1)}
-#legend{position:absolute;bottom:18px;right:10px;z-index:1001;padding:10px 12px;width:210px}
-#legend h3{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#5a8abf;margin-bottom:6px}
+#legend{position:absolute;bottom:18px;right:10px;z-index:1001;padding:14px 16px;width:300px}
+#legend h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#5a8abf;margin-bottom:8px}
 .legend-bar{width:100%;height:13px;border-radius:3px;margin-bottom:4px}
 .legend-labels{display:flex;justify-content:space-between;font-size:10px;color:#888}
 .leg-item{display:flex;align-items:center;gap:5px;margin-bottom:3px}
 .leg-swatch{width:11px;height:11px;border-radius:2px;flex-shrink:0;border:1px solid rgba(255,255,255,0.15);margin-top:2px}
-.leg-text{font-size:10px;color:#c0d0e0;line-height:1.15}
-.leg-sub{font-size:9px;color:#5a7a9a;margin-top:0;display:none}
+.leg-text{font-size:12px;color:#c0d0e0;line-height:1.3}
+.leg-sub{font-size:10px;color:#5a7a9a;margin-top:2px;display:block}
 /* Tooltip for ⓘ */
 .info-icon{display:inline-block;cursor:help;color:#5a8abf;font-size:11px;font-weight:700;margin-left:4px;position:relative}
 .info-icon .tip{display:none;position:absolute;right:18px;top:-4px;width:200px;background:#0d1825;border:1px solid rgba(90,138,191,0.4);border-radius:6px;padding:8px 10px;font-size:11px;color:#c0d0e0;line-height:1.45;z-index:9999;font-weight:400;white-space:normal;box-shadow:0 4px 16px rgba(0,0,0,0.6)}
 .info-icon:hover .tip{display:block}
 
-#info-bar{position:absolute;top:10px;left:10px;z-index:1001;padding:11px 15px;width:280px}
-#breakdown{position:absolute;top:50%;left:10px;transform:translateY(-50%);z-index:1001;padding:12px 14px;width:280px}
-#breakdown{position:absolute;top:50%;left:10px;transform:translateY(-50%);z-index:1001;padding:12px 14px;width:280px}
-#info-bar h1{font-size:14px;font-weight:700;color:#fff;margin-bottom:3px}
-#info-bar p{font-size:11px;color:#6a8aaa;line-height:1.4}
+#info-bar{position:absolute;top:10px;left:10px;z-index:1001;padding:14px 18px;width:300px}
+#breakdown{position:absolute;top:50%;left:10px;transform:translateY(-50%);z-index:1001;padding:14px 16px;width:300px}
+#breakdown{position:absolute;top:50%;left:10px;transform:translateY(-50%);z-index:1001;padding:14px 16px;width:300px}
+#info-bar h1{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px}
+#info-bar p{font-size:12px;color:#6a8aaa;line-height:1.4}
 .loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2000;background:rgba(15,22,36,0.97);padding:24px 36px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.6);text-align:center;color:#c8d8e8;font-size:14px;border:1px solid rgba(255,255,255,0.1)}
 .dot-anim::after{content:'';animation:dots 1.2s steps(4,end) infinite}
 @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}100%{content:'...'}}
@@ -166,7 +166,6 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
   <div class="ctrl-section">
     <label>Color by</label>
     <button class="mode-btn active" data-mode="category"   onclick="setMode(this)">🏷 Property Category</button>
-    <button class="mode-btn"        data-mode="combined"   onclick="setMode(this)">💰 Total Tax Revenue</button>
     <button class="mode-btn"        data-mode="per_acre"   onclick="setMode(this)">📐 Tax per Acre</button>
 
   </div>
@@ -185,15 +184,8 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
 
 <script>
 let TAX={};  // loaded async below
-const F={CAT:0,TC:1,TR:2,AC:3,RE:4,PP:5,TOT:6,PA:7,DEL:8,HPP:9,T5:10};
-const TOP5_COLORS=['','#7f1d1d','#991b1b','#b91c1c','#dc2626','#ef4444'];
-const TOP5_MARKERS=[
-  {rank:1,pn:'09-08.2-28-000-000-012.000',lat:39.55307,lng:-94.26807,amt:107172,cat:'Commercial'},
-  {rank:2,pn:'01-06.0-24-000-000-012.001',lat:39.73329,lng:-94.21865,amt:68002,cat:'Commercial'},
-  {rank:3,pn:'10-02.0-09-000-000-001.000',lat:39.5917,lng:-94.3832,amt:65662,cat:'Agricultural'},
-  {rank:4,pn:'10-07.1-25-004-014-002.001',lat:39.5459,lng:-94.32351,amt:53337,cat:'High Density Res.'},
-  {rank:5,pn:'01-06.0-23-002-039-001.000',lat:39.74006,lng:-94.2411,amt:35582,cat:'Commercial'}
-];
+const F={CAT:0,TC:1,TR:2,AC:3,RE:4,PP:5,TOT:6,PA:7,DEL:8,HPP:9};
+
 const CAT_COLOR={HD:'#dc2626',LT:'#2563eb',C:'#d97706',AG:'#6b7280',OT:'#374151'};
 const CAT_LABEL={HD:'High Density Residential <5ac',LT:'Large Tract Residential ≥5ac',C:'Commercial',AG:'Agricultural Only',OT:'Other'};
 const CAT_TIP={
@@ -212,16 +204,9 @@ L.control.scale({imperial:true,metric:false}).addTo(map);
 
 let currentMode='category',parcelLayer=null;
 const overlays={twp:null,cities:null};
-let top5MarkerLayer=null;
 const overlayOn={twp:false,cities:false};
 
-function colorCombined(v){
-  if(!v)return'#1a1a2e';
-  if(v<250) return'#eff6ff'; if(v<750) return'#93c5fd';
-  if(v<1500)return'#3b82f6'; if(v<3000)return'#1d4ed8';
-  if(v<6000)return'#1e3a8a'; if(v<12000)return'#172554';
-  return'#0a0f2e';
-}
+
 function colorPerAcre(v){
   if(!v||v<1)return'#e8e8e8';
   if(v<100) return'#fff1f2'; if(v<500) return'#fca5a5';
@@ -234,15 +219,11 @@ function getStyle(feature){
   let fill='#1a1a2e',op=0.1,stroke='#33405a',sw=0.35;
   if(d){
     if(currentMode==='category'){fill=CAT_COLOR[d[F.CAT]]||'#94a3b8';op=0.80;}
-    else if(currentMode==='combined'){
-      if(d[F.T5]){fill=TOP5_COLORS[d[F.T5]];op=0.95;}
-      else{fill=colorCombined(d[F.TOT]);op=0.82;}
-    }
+
     else if(currentMode==='per_acre'){fill=colorPerAcre(d[F.PA]);op=(d[F.PA]<1)?0.4:0.82;}
 
   }
-  // Top5 parcels get thick white border in combined mode
-  if(currentMode==='combined' && d && d[F.T5]){stroke='#ffffff';sw=2.5;}
+
   return{color:stroke,weight:sw,opacity:0.6,fillColor:fill,fillOpacity:op};
 }
 
@@ -281,10 +262,6 @@ const LEGENDS={
     <div class="leg-item"><div class="leg-swatch" style="background:#d97706"></div><div class="leg-text">Commercial<span class="info-icon">ⓘ<span class="tip">Any parcel with commercial assessed value — businesses, retail, industrial, rentals. Highest tax per acre of any category.</span></span><div class="leg-sub">620 parcels · $2.31M</div></div></div>
     <div class="leg-item"><div class="leg-swatch" style="background:#6b7280"></div><div class="leg-text">Agricultural Only<span class="info-icon">ⓘ<span class="tip">Land with ag assessed value but no residential structure — cropland, pasture, timber. The house, if any, is on a separate parcel.</span></span><div class="leg-sub">2,502 parcels · $1.03M</div></div></div>
     <div class="leg-item"><div class="leg-swatch" style="background:#1a1a2e;border-color:#555"></div><div class="leg-text" style="color:#666">No tax record</div></div>`},
-  combined:{title:'Total Tax Revenue',html:`
-    <div class="legend-bar" style="background:linear-gradient(to right,#eff6ff,#93c5fd,#3b82f6,#1d4ed8,#1e3a8a,#172554,#0a0f2e)"></div>
-    <div class="legend-labels"><span>$0</span><span>$750</span><span>$3K</span><span>$6K</span><span>$12K+</span></div>
-    <div style="margin-top:6px;font-size:10px;color:#666">RE tax + matched PP tax per parcel</div>`},
   per_acre:{title:'Combined Tax per Acre',html:`
     <div class="legend-bar" style="background:linear-gradient(to right,#fff1f2,#fca5a5,#ef4444,#b91c1c,#7f1d1d)"></div>
     <div class="legend-labels"><span>$100</span><span>$500</span><span>$1.5K</span><span>$5K+</span></div>
@@ -294,84 +271,54 @@ const LEGENDS={
 
 const BREAKDOWNS={
   category:`
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,0.08)">2025 Tax Revenue by Category</div>
-    <div style="font-size:11px;color:#7fcfff;font-weight:700;margin-bottom:10px;line-height:1.4">★ High Density Residential is Clinton County's #1 tax revenue source</div>
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.08)">2025 Tax Revenue by Category</div>
+    <div style="font-size:13px;color:#7fcfff;font-weight:700;margin-bottom:12px;line-height:1.4">★ High Density Residential is Clinton County's #1 tax revenue source</div>
     <div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#f87171;font-weight:700">High Density Res. &lt;5ac</span><span style="color:#7fcfff;font-weight:700">$12.56M</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#f87171;font-weight:700">High Density Res. &lt;5ac</span><span style="color:#7fcfff;font-weight:700">$12.56M</span></div>
       <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:100%;height:100%;background:#dc2626;border-radius:3px"></div></div>
-      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">6,814 parcels · avg 0.8 acres</div>
+      <div style="font-size:11px;color:#5a7a9a;margin-top:3px">6,814 parcels · avg 0.8 acres</div>
     </div>
     <div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#93c5fd;font-weight:700">Large Tract Res. ≥5ac</span><span style="color:#7fcfff;font-weight:700">$8.54M</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#93c5fd;font-weight:700">Large Tract Res. ≥5ac</span><span style="color:#7fcfff;font-weight:700">$8.54M</span></div>
       <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:68%;height:100%;background:#2563eb;border-radius:3px"></div></div>
-      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">2,672 parcels · avg 34 acres</div>
+      <div style="font-size:11px;color:#5a7a9a;margin-top:3px">2,672 parcels · avg 34 acres</div>
     </div>
     <div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#fcd34d;font-weight:700">Commercial</span><span style="color:#7fcfff;font-weight:700">$2.31M</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#fcd34d;font-weight:700">Commercial</span><span style="color:#7fcfff;font-weight:700">$2.31M</span></div>
       <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:18%;height:100%;background:#d97706;border-radius:3px"></div></div>
-      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">620 parcels · avg 6 acres</div>
+      <div style="font-size:11px;color:#5a7a9a;margin-top:3px">620 parcels · avg 6 acres</div>
     </div>
     <div style="margin-bottom:4px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#d1d5db;font-weight:700">Agricultural Only</span><span style="color:#7fcfff;font-weight:700">$1.03M</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#d1d5db;font-weight:700">Agricultural Only</span><span style="color:#7fcfff;font-weight:700">$1.03M</span></div>
       <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:8%;height:100%;background:#6b7280;border-radius:3px"></div></div>
-      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">2,502 parcels · avg 61 acres</div>
+      <div style="font-size:11px;color:#5a7a9a;margin-top:3px">2,502 parcels · avg 61 acres</div>
     </div>
-    <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:9px;color:#3a5a7a;line-height:1.4">Includes RE + matched PP tax. $1.83M PP from non-landowners not shown above.</div>`,
-
-  combined:`
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,0.08)">Top 5 Highest Tax Parcels</div>
-    <div style="font-size:11px;color:#7fcfff;font-weight:700;margin-bottom:10px;line-height:1.4">★ Darkest blue parcels generate the most total tax revenue</div>
-    <div style="margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,0.06)">
-      <div style="font-size:11px;color:#fcd34d;font-weight:700"><span style="color:#ef4444;margin-right:5px">①</span>$107,172</div>
-      <div style="font-size:10px;color:#c0d0e0">09-08.2-28-000-000-012.000</div>
-      <div style="font-size:9px;color:#5a7a9a">Commercial</div>
-    </div>
-    <div style="margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,0.06)">
-      <div style="font-size:11px;color:#fcd34d;font-weight:700"><span style="color:#ef4444;margin-right:5px">②</span>$68,002</div>
-      <div style="font-size:10px;color:#c0d0e0">01-06.0-24-000-000-012.001</div>
-      <div style="font-size:9px;color:#5a7a9a">Commercial</div>
-    </div>
-    <div style="margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,0.06)">
-      <div style="font-size:11px;color:#fcd34d;font-weight:700"><span style="color:#ef4444;margin-right:5px">③</span>$65,662</div>
-      <div style="font-size:10px;color:#c0d0e0">10-02.0-09-000-000-001.000</div>
-      <div style="font-size:9px;color:#5a7a9a">Agricultural</div>
-    </div>
-    <div style="margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,0.06)">
-      <div style="font-size:11px;color:#fcd34d;font-weight:700"><span style="color:#ef4444;margin-right:5px">④</span>$53,337</div>
-      <div style="font-size:10px;color:#c0d0e0">10-07.1-25-004-014-002.001</div>
-      <div style="font-size:9px;color:#5a7a9a">High Density Residential</div>
-    </div>
-    <div style="margin-bottom:4px">
-      <div style="font-size:11px;color:#fcd34d;font-weight:700"><span style="color:#ef4444;margin-right:5px">⑤</span>$35,582</div>
-      <div style="font-size:10px;color:#c0d0e0">01-06.0-23-002-039-001.000</div>
-      <div style="font-size:9px;color:#5a7a9a">Commercial</div>
-    </div>
-    <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:9px;color:#3a5a7a">These 5 parcels are highlighted in red on the map with a white border. Switch to Total Tax Revenue view to see them.</div>`,
+    <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:10px;color:#3a5a7a;line-height:1.5">Includes RE + matched PP tax. $1.83M PP from non-landowners not shown above.</div>`,
 
   per_acre:`
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,0.08)">Tax Revenue per Acre</div>
-    <div style="font-size:11px;color:#7fcfff;font-weight:700;margin-bottom:10px;line-height:1.4">★ Small lots generate dramatically more tax per acre than large rural parcels</div>
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.08)">Tax Revenue per Acre</div>
+    <div style="font-size:13px;color:#7fcfff;font-weight:700;margin-bottom:12px;line-height:1.4">★ Small lots generate dramatically more tax per acre than large rural parcels</div>
     <div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#f87171;font-weight:700">High Density Res.</span><span style="color:#fca5a5;font-weight:700">$2,263/ac</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:100%;height:100%;background:#ef4444;border-radius:3px"></div></div>
-      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">avg 0.8 acres per parcel</div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#f87171;font-weight:700">High Density Res.</span><span style="color:#fca5a5;font-weight:700">$2,263/ac</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:100%;height:100%;background:#dc2626;border-radius:3px"></div></div>
+      <div style="font-size:11px;color:#5a7a9a;margin-top:3px">avg 0.8 acres per parcel</div>
     </div>
     <div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#fcd34d;font-weight:700">Commercial</span><span style="color:#fca5a5;font-weight:700">$617/ac</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:27%;height:100%;background:#ef4444;border-radius:3px"></div></div>
-      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">avg 6 acres per parcel</div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#fcd34d;font-weight:700">Commercial</span><span style="color:#fca5a5;font-weight:700">$617/ac</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:27%;height:100%;background:#d97706;border-radius:3px"></div></div>
+      <div style="font-size:11px;color:#5a7a9a;margin-top:3px">avg 6 acres per parcel</div>
     </div>
     <div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#93c5fd;font-weight:700">Large Tract Res.</span><span style="color:#fca5a5;font-weight:700">$94/ac</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:4%;height:100%;background:#ef4444;border-radius:3px"></div></div>
-      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">avg 34 acres per parcel</div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#93c5fd;font-weight:700">Large Tract Res.</span><span style="color:#fca5a5;font-weight:700">$94/ac</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:4%;height:100%;background:#2563eb;border-radius:3px"></div></div>
+      <div style="font-size:11px;color:#5a7a9a;margin-top:3px">avg 34 acres per parcel</div>
     </div>
     <div style="margin-bottom:4px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#d1d5db;font-weight:700">Agricultural Only</span><span style="color:#fca5a5;font-weight:700">$7/ac</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:0.3%;height:100%;background:#ef4444;border-radius:3px"></div></div>
-      <div style="font-size:9px;color:#5a7a9a;margin-top:2px">avg 61 acres per parcel</div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#d1d5db;font-weight:700">Agricultural Only</span><span style="color:#fca5a5;font-weight:700">$7/ac</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:0.3%;height:100%;background:#6b7280;border-radius:3px"></div></div>
+      <div style="font-size:11px;color:#5a7a9a;margin-top:3px">avg 61 acres per parcel</div>
     </div>
-    <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:9px;color:#3a5a7a;line-height:1.4">HD Residential generates 333x more tax per acre than Agricultural land.</div>`
+    <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:10px;color:#3a5a7a;line-height:1.5">HD Residential generates 333x more tax per acre than Agricultural land.</div>`
 };
 
 function updateBreakdown(mode){
@@ -383,31 +330,6 @@ function updateLegend(mode){
   document.getElementById('leg-title').textContent=LEGENDS[mode].title;
   document.getElementById('leg-body').innerHTML=LEGENDS[mode].html+`<div style="margin-top:9px;padding-top:7px;border-top:1px solid rgba(255,255,255,0.1);font-size:10px;color:#4a6a8a;line-height:1.5">      <b style="color:#5a8abf">PP coverage: 71.9%</b>      <span class="info-icon">ⓘ<span class="tip" style="left:auto;right:18px">71.9% of total PP tax ($4.67M of $6.49M) was matched to a RE parcel by name + tax code. Each PP account assigned to owner\\'s primary parcel only — no double counting. Remaining $1.83M belongs to renters and non-landowners.</span></span><br>      Clinton County\\'s full 2025 tax levy of ~$26.3M is completely accounted for — $24.4M mapped to parcels, $1.83M identified as PP tax from non-landowners who rent or hold no real estate in the county.    </div>`; 
 }
-function showTop5Markers(){
-  if(top5MarkerLayer) map.removeLayer(top5MarkerLayer);
-  const markers = TOP5_MARKERS.map(t=>{
-    const icon = L.divIcon({
-      className:'',
-      html:'<div style="background:#dc2626;color:#fff;border:2.5px solid #ffffff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;box-shadow:0 2px 8px rgba(0,0,0,0.6);font-family:Arial,sans-serif;line-height:1;">'+t.rank+'</div>',
-      iconSize:[28,28],
-      iconAnchor:[14,14]
-    });
-    const m = L.marker([t.lat,t.lng],{icon,zIndexOffset:1000});
-    m.on('click',()=>{
-      L.popup({maxWidth:280})
-        .setLatLng([t.lat,t.lng])
-        .setContent('<div class="px"><div class="px-title">#'+t.rank+' Top Revenue Parcel</div><table class="px-tbl"><tr><td>Parcel #</td><td>'+t.pn+'</td></tr><tr><td>Category</td><td>'+t.cat+'</td></tr><tr class="px-hi"><td><b>Total Tax 2025</b></td><td><b style="color:#b91c1c">$'+t.amt.toLocaleString()+'</b></td></tr></table></div>')
-        .openOn(map);
-    });
-    return m;
-  });
-  top5MarkerLayer = L.layerGroup(markers).addTo(map);
-}
-
-function hideTop5Markers(){
-  if(top5MarkerLayer){ map.removeLayer(top5MarkerLayer); top5MarkerLayer=null; }
-}
-
 function setMode(btn){
   currentMode=btn.dataset.mode;
   document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
@@ -415,8 +337,6 @@ function setMode(btn){
   updateLegend(currentMode);
   updateBreakdown(currentMode);
   if(parcelLayer)parcelLayer.setStyle(getStyle);
-  if(currentMode==='combined') showTop5Markers();
-  else hideTop5Markers();
 }
 
 function toggleOverlay(k){
@@ -477,7 +397,7 @@ async function loadMap(){
   try {
     const tData = await safeFetch('/static/Townships/townships.geojson');
     overlays.twp=L.geoJSON(tData,{renderer:L.canvas(),
-      style:{color:'#ffffff',weight:2.5,opacity:0.7,fillOpacity:0},
+      style:{color:'#ffffff',weight:3,opacity:0.9,fillOpacity:0},
       onEachFeature(f,layer){
         const name=f.properties?.NAME||f.properties?.NAMELSAD||'';
         if(name)layer.bindTooltip(name,{permanent:true,direction:'center',className:'township-label'});
