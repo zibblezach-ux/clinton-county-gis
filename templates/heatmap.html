@@ -162,19 +162,15 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
   <div class="ctrl-section">
     <label>Color by</label>
     <button class="mode-btn active" data-mode="category"   onclick="setMode(this)">🏷 Property Category</button>
-    <button class="mode-btn"        data-mode="combined"   onclick="setMode(this)">💰 Combined Tax Revenue</button>
+    <button class="mode-btn"        data-mode="combined"   onclick="setMode(this)">💰 Total Tax Revenue</button>
     <button class="mode-btn"        data-mode="per_acre"   onclick="setMode(this)">📐 Tax per Acre</button>
     <button class="mode-btn"        data-mode="delinquent" onclick="setMode(this)">⚠️ Delinquency</button>
   </div>
-  <div class="ctrl-section">
-    <label>Base Map</label>
-    <button class="toggle-btn active" id="btn-street" onclick="setBase('street')">Street</button>
-    <button class="toggle-btn"        id="btn-sat"    onclick="setBase('sat')">Satellite</button>
-  </div>
+
   <div class="ctrl-section">
     <label>Overlays</label>
     <button class="toggle-btn" id="btn-twp"    onclick="toggleOverlay('twp')">Townships</button>
-    <button class="toggle-btn" id="btn-roads"  onclick="toggleOverlay('roads')">Roads</button>
+
     <button class="toggle-btn" id="btn-cities" onclick="toggleOverlay('cities')">Cities</button>
   </div>
 </div>
@@ -198,26 +194,26 @@ const CAT_TIP={
 
 const map=L.map('map',{preferCanvas:true});
 map.setView([39.60,-94.37],11);
-const streetTile=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles © Esri'}).addTo(map);
-const satTile=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles © Esri'});
+const streetTile=L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/">CARTO</a>',subdomains:'abcd'}).addTo(map);
+
 L.control.scale({imperial:true,metric:false}).addTo(map);
 
 let currentMode='category',parcelLayer=null;
-const overlays={twp:null,roads:null,cities:null};
-const overlayOn={twp:false,roads:false,cities:false};
+const overlays={twp:null,cities:null};
+const overlayOn={twp:false,cities:false};
 
 function colorCombined(v){
   if(!v)return'#1a1a2e';
-  if(v<250) return'#ffffb2'; if(v<750) return'#fecc5c';
-  if(v<1500)return'#fd8d3c'; if(v<3000)return'#f03b20';
-  if(v<6000)return'#bd0026'; if(v<12000)return'#800026';
-  return'#3d0010';
+  if(v<250) return'#f0fdf4'; if(v<750) return'#86efac';
+  if(v<1500)return'#22c55e'; if(v<3000)return'#16a34a';
+  if(v<6000)return'#15803d'; if(v<12000)return'#166534';
+  return'#052e16';
 }
 function colorPerAcre(v){
   if(!v||v<1)return'#1a1a2e';
-  if(v<100) return'#f0f9ff'; if(v<500) return'#7dd3fc';
-  if(v<1500)return'#0284c7'; if(v<5000)return'#075985';
-  return'#0c4a6e';
+  if(v<100) return'#fff1f2'; if(v<500) return'#fca5a5';
+  if(v<1500)return'#ef4444'; if(v<5000)return'#b91c1c';
+  return'#7f1d1d';
 }
 function getStyle(feature){
   const pn=feature.properties._pn;
@@ -269,10 +265,10 @@ const LEGENDS={
     <div class="leg-item"><div class="leg-swatch" style="background:#f59e0b"></div><div class="leg-text">Commercial<span class="info-icon">ⓘ<span class="tip">Any parcel with commercial assessed value — businesses, retail, industrial, rentals. Highest tax per acre of any category.</span></span><div class="leg-sub">620 parcels · $2.31M</div></div></div>
     <div class="leg-item"><div class="leg-swatch" style="background:#a78bfa"></div><div class="leg-text">Agricultural Only<span class="info-icon">ⓘ<span class="tip">Land with ag assessed value but no residential structure — cropland, pasture, timber. The house, if any, is on a separate parcel.</span></span><div class="leg-sub">2,502 parcels · $1.03M</div></div></div>
     <div class="leg-item"><div class="leg-swatch" style="background:#1a1a2e;border-color:#555"></div><div class="leg-text" style="color:#666">No tax record</div></div>`},
-  combined:{title:'Combined Tax Revenue',html:`
+  combined:{title:'Total Tax Revenue',html:`
     <div class="legend-bar" style="background:linear-gradient(to right,#ffffb2,#fecc5c,#fd8d3c,#f03b20,#bd0026,#800026,#3d0010)"></div>
     <div class="legend-labels"><span>$0</span><span>$750</span><span>$3K</span><span>$6K</span><span>$12K+</span></div>
-    <div style="margin-top:6px;font-size:10px;color:#666">Includes RE + matched PP tax</div>`},
+    <div style="margin-top:6px;font-size:10px;color:#666">RE tax + matched PP tax per parcel</div>`},
   per_acre:{title:'Combined Tax per Acre',html:`
     <div class="legend-bar" style="background:linear-gradient(to right,#f0f9ff,#7dd3fc,#0284c7,#075985,#0c4a6e)"></div>
     <div class="legend-labels"><span>$100</span><span>$500</span><span>$1.5K</span><span>$5K+</span></div>
@@ -294,12 +290,7 @@ function setMode(btn){
   updateLegend(currentMode);
   if(parcelLayer)parcelLayer.setStyle(getStyle);
 }
-function setBase(w){
-  document.getElementById('btn-street').classList.toggle('active',w==='street');
-  document.getElementById('btn-sat').classList.toggle('active',w==='sat');
-  if(w==='street'){map.removeLayer(satTile);map.addLayer(streetTile);}
-  else{map.removeLayer(streetTile);map.addLayer(satTile);}
-}
+
 function toggleOverlay(k){
   overlayOn[k]=!overlayOn[k];
   document.getElementById('btn-'+k).classList.toggle('active',overlayOn[k]);
@@ -362,10 +353,7 @@ async function loadMap(){
     });
   } catch(e){ console.warn('Townships failed:',e.message); }
 
-  try {
-    const rData = await safeFetch('/static/Roads/roads.geojson');
-    overlays.roads=L.geoJSON(rData,{renderer:L.canvas(),style:{color:'#aaa',weight:0.9,opacity:0.45}});
-  } catch(e){ console.warn('Roads failed:',e.message); }
+
 
   try {
     const cData = await safeFetch('/static/Cities/cities.geojson');
