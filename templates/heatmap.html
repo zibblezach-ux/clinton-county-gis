@@ -320,7 +320,7 @@ async function safeFetch(url){
 async function loadMap(){
   // Step 0: load tax lookup data
   setLoading('Loading tax data…');
-  const taxData = await safeFetch('/static/data/tax_2025.json');
+  const taxData = await safeFetch('/api/tax');
   Object.assign(TAX, taxData);
 
   // Step 1: parcels
