@@ -186,7 +186,14 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
 <script>
 let TAX={};  // loaded async below
 const F={CAT:0,TC:1,TR:2,AC:3,RE:4,PP:5,TOT:6,PA:7,DEL:8,HPP:9,T5:10};
-const TOP5_COLORS=['','#000000','#1c1c1c','#2d2d2d','#3d3d3d','#4d4d4d'];
+const TOP5_COLORS=['','#7f1d1d','#991b1b','#b91c1c','#dc2626','#ef4444'];
+const TOP5_MARKERS=[
+  {rank:1,pn:'09-08.2-28-000-000-012.000',lat:39.55307,lng:-94.26807,amt:107172,cat:'Commercial'},
+  {rank:2,pn:'01-06.0-24-000-000-012.001',lat:39.73329,lng:-94.21865,amt:68002,cat:'Commercial'},
+  {rank:3,pn:'10-02.0-09-000-000-001.000',lat:39.5917,lng:-94.3832,amt:65662,cat:'Agricultural'},
+  {rank:4,pn:'10-07.1-25-004-014-002.001',lat:39.5459,lng:-94.32351,amt:53337,cat:'High Density Res.'},
+  {rank:5,pn:'01-06.0-23-002-039-001.000',lat:39.74006,lng:-94.2411,amt:35582,cat:'Commercial'}
+];
 const CAT_COLOR={HD:'#dc2626',LT:'#2563eb',C:'#d97706',AG:'#6b7280',OT:'#374151'};
 const CAT_LABEL={HD:'High Density Residential <5ac',LT:'Large Tract Residential ≥5ac',C:'Commercial',AG:'Agricultural Only',OT:'Other'};
 const CAT_TIP={
@@ -282,7 +289,8 @@ const LEGENDS={
     <div class="legend-bar" style="background:linear-gradient(to right,#fff1f2,#fca5a5,#ef4444,#b91c1c,#7f1d1d)"></div>
     <div class="legend-labels"><span>$100</span><span>$500</span><span>$1.5K</span><span>$5K+</span></div>
     <div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:10px;color:#888"><div style="width:12px;height:12px;background:#e8e8e8;border-radius:2px;border:1px solid #ccc;flex-shrink:0"></div>No acreage data</div>
-    <div style="margin-top:4px;font-size:10px;color:#666">Small residential lots brightest — high revenue per acre vs. large rural parcels</div>`},
+    <div style="margin-top:4px;font-size:10px;color:#666">Small residential lots brightest — high revenue per acre vs. large rural parcels</div>`}
+};
 
 const BREAKDOWNS={
   category:`
@@ -363,8 +371,8 @@ const BREAKDOWNS={
       <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:10px;overflow:hidden"><div style="width:0.3%;height:100%;background:#ef4444;border-radius:3px"></div></div>
       <div style="font-size:9px;color:#5a7a9a;margin-top:2px">avg 61 acres per parcel</div>
     </div>
-    <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:9px;color:#3a5a7a;line-height:1.4">HD Residential generates 333x more tax per acre than Agricultural land.</div>`,
-
+    <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:9px;color:#3a5a7a;line-height:1.4">HD Residential generates 333x more tax per acre than Agricultural land.</div>`
+};
 
 function updateBreakdown(mode){
   const el = document.getElementById('breakdown-content');
@@ -388,12 +396,7 @@ function showTop5Markers(){
     m.on('click',()=>{
       L.popup({maxWidth:280})
         .setLatLng([t.lat,t.lng])
-        .setContent('<div class="px"><div class="px-title">#'+t.rank+' Top Revenue Parcel</div>
-          <table class="px-tbl">
-            <tr><td>Parcel #</td><td>${t.pn}</td></tr>
-            <tr><td>Category</td><td>${t.cat}</td></tr>
-            <tr class="px-hi"><td><b>Total Tax 2025</b></td><td><b style="color:#b91c1c">$${t.amt.toLocaleString()}</b></td></tr>
-          </table></div>')
+        .setContent('<div class="px"><div class="px-title">#'+t.rank+' Top Revenue Parcel</div><table class="px-tbl"><tr><td>Parcel #</td><td>'+t.pn+'</td></tr><tr><td>Category</td><td>'+t.cat+'</td></tr><tr class="px-hi"><td><b>Total Tax 2025</b></td><td><b style="color:#b91c1c">$'+t.amt.toLocaleString()+'</b></td></tr></table></div>')
         .openOn(map);
     });
     return m;
