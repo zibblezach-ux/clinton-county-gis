@@ -187,7 +187,7 @@ let TAX={};  // loaded async below
 const F={CAT:0,TC:1,TR:2,AC:3,RE:4,PP:5,TOT:6,PA:7,DEL:8,HPP:9};
 
 const CAT_COLOR={MUN:'#dc2626',SR:'#2563eb',LT:'#16a34a',C:'#ea580c',AG:'#6b7280',OT:'#374151'};
-const CAT_LABEL={MUN:'Municipal Residential',SR:'Small Tract Residential',LT:'Agricultural with Homestead',C:'Commercial',AG:'Agricultural',OT:'Other'};
+const CAT_LABEL={MUN:'Municipal Residential',SR:'Small Tract Residential',LT:'Agricultural with Homestead',C:'Commercial',AG:'Agriculture without Homestead',OT:'Other'};
 const CAT_TIP={
   HD:'Parcels with a residential structure on lots smaller than 5 acres. Typically in-town and suburban properties.',
   LT:'Parcels with a residential structure on 5 or more acres — rural homesteads, farmsteads with a dwelling.',
@@ -263,7 +263,7 @@ const LEGENDS={
     <div class="leg-item"><div class="leg-swatch" style="background:#60a5fa"></div><div class="leg-text">Small Residential<span class="info-icon">ⓘ<span class="tip">Residential parcels outside city limits, 9 acres or less. Rural homes and small rural lots.</span></span><div class="leg-sub">1,876 parcels · $5.56M combined</div></div></div>
     <div class="leg-item"><div class="leg-swatch" style="background:#16a34a"></div><div class="leg-text">Agricultural with Homestead<span class="info-icon">ⓘ<span class="tip">Residential parcels over 9 acres — farmsteads with a house. Agricultural scale with a residential structure.</span></span><div class="leg-sub">1,913 parcels · $6.08M combined</div></div></div>
     <div class="leg-item"><div class="leg-swatch" style="background:#ea580c"></div><div class="leg-text">Commercial<span class="info-icon">ⓘ<span class="tip">Any parcel with commercial assessed value — businesses, retail, industrial, rental properties.</span></span><div class="leg-sub">620 parcels · $2.31M combined</div></div></div>
-    <div class="leg-item"><div class="leg-swatch" style="background:#6b7280"></div><div class="leg-text">Agricultural<span class="info-icon">ⓘ<span class="tip">Agricultural land with no residential structure — raw cropland, pasture, timber, vacant rural land.</span></span><div class="leg-sub">2,502 parcels · $1.03M combined</div></div></div>
+    <div class="leg-item"><div class="leg-swatch" style="background:#6b7280"></div><div class="leg-text">Agriculture without Homestead<span class="info-icon">ⓘ<span class="tip">Agricultural land with no residential structure — raw cropland, pasture, timber, vacant rural land.</span></span><div class="leg-sub">2,502 parcels · $1.03M combined</div></div></div>
     <div class="leg-item"><div class="leg-swatch" style="background:#1a1a2e;border-color:#555"></div><div class="leg-text" style="color:#666">No tax record</div></div>`},
   per_acre:{title:'Combined Tax per Acre',html:`
     <div class="legend-bar" style="background:linear-gradient(to right,#fff1f2,#fca5a5,#ef4444,#b91c1c,#7f1d1d)"></div>
@@ -282,14 +282,14 @@ const BREAKDOWNS={
       <div style="font-size:11px;color:#5a7a9a;margin-top:3px">6,174 parcels · in-city · ≤9 acres</div>
     </div>
     <div style="margin-bottom:8px">
-      <div style="font-size:13px;margin-bottom:4px;display:flex;justify-content:space-between"><span style="color:#2563eb;font-weight:700">Small Tract Residential</span><span style="color:#7fcfff;font-weight:700">$5.56M</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:52%;height:100%;background:#2563eb;border-radius:3px"></div></div>
-      <div style="font-size:11px;color:#5a7a9a;margin-top:3px">1,876 parcels · rural · ≤9 acres</div>
-    </div>
-    <div style="margin-bottom:8px">
       <div style="font-size:13px;margin-bottom:4px;display:flex;justify-content:space-between"><span style="color:#16a34a;font-weight:700">Agricultural with Homestead</span><span style="color:#7fcfff;font-weight:700">$6.08M</span></div>
       <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:57%;height:100%;background:#16a34a;border-radius:3px"></div></div>
       <div style="font-size:11px;color:#5a7a9a;margin-top:3px">1,913 parcels · residential · >9 acres</div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div style="font-size:13px;margin-bottom:4px;display:flex;justify-content:space-between"><span style="color:#2563eb;font-weight:700">Small Tract Residential</span><span style="color:#7fcfff;font-weight:700">$5.56M</span></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:52%;height:100%;background:#2563eb;border-radius:3px"></div></div>
+      <div style="font-size:11px;color:#5a7a9a;margin-top:3px">1,876 parcels · rural · ≤9 acres</div>
     </div>
     <div style="margin-bottom:8px">
       <div style="font-size:13px;margin-bottom:4px;display:flex;justify-content:space-between"><span style="color:#ea580c;font-weight:700">Commercial</span><span style="color:#7fcfff;font-weight:700">$1.08M</span></div>
@@ -297,7 +297,7 @@ const BREAKDOWNS={
       <div style="font-size:11px;color:#5a7a9a;margin-top:3px">215 parcels · commercial assessed value</div>
     </div>
     <div style="margin-bottom:4px">
-      <div style="font-size:13px;margin-bottom:4px;display:flex;justify-content:space-between"><span style="color:#6b7280;font-weight:700">Agricultural</span><span style="color:#7fcfff;font-weight:700">$1.02M</span></div>
+      <div style="font-size:13px;margin-bottom:4px;display:flex;justify-content:space-between"><span style="color:#6b7280;font-weight:700">Agriculture without Homestead</span><span style="color:#7fcfff;font-weight:700">$1.02M</span></div>
       <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:10%;height:100%;background:#6b7280;border-radius:3px"></div></div>
       <div style="font-size:11px;color:#5a7a9a;margin-top:3px">2,430 parcels · no residence · avg 62 acres</div>
     </div>
@@ -307,26 +307,26 @@ const BREAKDOWNS={
     <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.08)">Tax Revenue per Acre</div>
     <div style="font-size:13px;color:#7fcfff;font-weight:700;margin-bottom:14px;line-height:1.4">Small city lots generate dramatically more tax per acre than rural land</div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-      <span style="font-size:13px;color:#dc2626;font-weight:700">Municipal Residential</span>
+      <span style="font-size:13px;color:#c0d0e0;font-weight:700">Municipal Residential</span>
       <span style="font-size:14px;color:#ffffff;font-weight:700">$3,087/ac</span>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-      <span style="font-size:13px;color:#ea580c;font-weight:700">Commercial</span>
+      <span style="font-size:13px;color:#c0d0e0;font-weight:700">Commercial</span>
       <span style="font-size:14px;color:#ffffff;font-weight:700">$317/ac</span>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-      <span style="font-size:13px;color:#2563eb;font-weight:700">Small Tract Residential</span>
+      <span style="font-size:13px;color:#c0d0e0;font-weight:700">Small Tract Residential</span>
       <span style="font-size:14px;color:#ffffff;font-weight:700">$780/ac</span>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-      <span style="font-size:13px;color:#16a34a;font-weight:700">Agricultural with Homestead</span>
+      <span style="font-size:13px;color:#c0d0e0;font-weight:700">Agricultural with Homestead</span>
       <span style="font-size:14px;color:#ffffff;font-weight:700">$70/ac</span>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-      <span style="font-size:13px;color:#6b7280;font-weight:700">Agricultural</span>
+      <span style="font-size:13px;color:#c0d0e0;font-weight:700">Agriculture without Homestead</span>
       <span style="font-size:14px;color:#ffffff;font-weight:700">$7/ac</span>
     </div>
-    <div style="padding-top:10px;font-size:11px;color:#3a5a7a;line-height:1.5">Municipal Residential generates 441x more tax per acre than Agricultural land. Darker red on map = higher revenue per acre.</div>`
+    <div style="padding-top:10px;font-size:11px;color:#7fb3d3;line-height:1.5">Municipal Residential generates 441x more tax per acre than Agriculture without Homestead. Darker red on map = higher revenue per acre.</div>`
 };
 
 function updateBreakdown(mode){
@@ -367,14 +367,14 @@ async function safeFetch(url){
 async function loadMap(){
   // Step 0: load tax lookup data
   setLoading('Loading tax data…');
-  const taxData = await safeFetch('/api/tax?v=20260614c');
+  const taxData = await safeFetch('/api/tax?v=20260614d');
   Object.assign(TAX, taxData);
   const delinqCount = Object.values(TAX).filter(v=>v[8]===1).length;
   console.log('TAX loaded:', Object.keys(TAX).length, 'parcels,', delinqCount, 'delinquent');
 
   // Step 1: parcels
   setLoading('Loading parcels…');
-  const pData = await safeFetch('/static/Parcels/parcels.geojson?v=20260614c');
+  const pData = await safeFetch('/static/Parcels/parcels.geojson?v=20260614d');
 
   setLoading('Rendering '+pData.features.length.toLocaleString()+' parcels…');
   pData.features.forEach(f=>{
