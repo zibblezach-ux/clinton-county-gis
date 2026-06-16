@@ -303,12 +303,13 @@ if __name__ == "__main__":
     keep = ["JURISDICTION", "FULLNAME", "MTFCC", "RTTYP", "OSM_NAME", "OSM_REF"]
 
     print("\nWriting GeoJSON files...")
-    write_geojson(roads[roads["JURISDICTION"] == "MoDOT"],     "static/roads_modot.geojson",    keep)
-    write_geojson(roads[roads["JURISDICTION"] == "PSRD"],      "static/roads_psrd.geojson",      keep)
-    write_geojson(roads[roads["JURISDICTION"] == "Municipal"], "static/roads_municipal.geojson", keep)
-    write_geojson(roads[roads["JURISDICTION"] == "County"],    "static/roads_county.geojson",    keep)
-    write_geojson(munis, "static/boundaries_municipal.geojson", ["NAME", "GEOID"])
-    write_geojson(psrd,  "static/boundary_psrd.geojson",        ["NAME"])
+    os.makedirs("static/Roads", exist_ok=True)
+    write_geojson(roads[roads["JURISDICTION"] == "MoDOT"],     "static/Roads/roads_modot.geojson",    keep)
+    write_geojson(roads[roads["JURISDICTION"] == "PSRD"],      "static/Roads/roads_psrd.geojson",      keep)
+    write_geojson(roads[roads["JURISDICTION"] == "Municipal"], "static/Roads/roads_municipal.geojson", keep)
+    write_geojson(roads[roads["JURISDICTION"] == "County"],    "static/Roads/roads_county.geojson",    keep)
+    write_geojson(munis, "static/Roads/boundaries_municipal.geojson", ["NAME", "GEOID"])
+    write_geojson(psrd,  "static/Roads/boundary_psrd.geojson",        ["NAME"])
 
     src = os.path.join(os.path.dirname(os.path.abspath(__file__)), "clinton_boundary.geojson")
     dst = os.path.join("static", "clinton_boundary.geojson")
