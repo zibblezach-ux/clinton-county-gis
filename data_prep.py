@@ -206,45 +206,55 @@ def enrich_with_osm_names(roads_gdf, osm_gdf):
 
 def classify_roads(roads_gdf, municipal_gdf):
     """
-    Classification rules:
-      RTTYP I/U/S or MTFCC S1100 -> MoDOT
-      Road centroid inside city boundary -> Municipal
-      Everything else -> County
+    Classification rules (priority order):
+      1. RTTYP I/U/S or MTFCC S1100          -> MoDOT
+      2. RTTYP C                               -> County Commission
+      3. RTTYP M                               -> Municipal
+      4. RTTYP empty + centroid inside city    -> Municipal
+      5. Everything else (unclassified)        -> County Commission
+
+    Using RTTYP as the primary signal avoids mis-classifying county roads
+    (RTTYP=C) or state routes (RTTYP=S/U/I) that happen to pass through
+    city limits as Municipal.  The spatial join is a fallback only for
+    segments that carry no RTTYP designation.
     """
     print("Classifying road segments...")
 
-    roads = roads_gdf.to_crs("EPSG:3857").copy()
-    munis = municipal_gdf.to_crs("EPSG:3857")
+    roads_proj = roads_gdf.to_crs("EPSG:3857").copy()
+    munis_proj = municipal_gdf.to_crs("EPSG:3857")
 
     rttyp = roads_gdf["RTTYP"].fillna("") if "RTTYP" in roads_gdf.columns else pd.Series("", index=roads_gdf.index)
     mtfcc = roads_gdf["MTFCC"].fillna("") if "MTFCC" in roads_gdf.columns else pd.Series("", index=roads_gdf.index)
 
-    # Use road centroids for spatial join — more reliable than full geometry
-    centroids = roads[["geometry"]].copy()
-    centroids["geometry"] = roads.geometry.centroid
-
-    in_muni = gpd.sjoin(
-        centroids,
-        munis[["geometry"]],
-        how="left",
-        predicate="within"
-    )
-
-    inside_city_indices = in_muni[in_muni["index_right"].notna()].index
-    inside_city = pd.Series(False, index=roads_gdf.index)
-    inside_city[inside_city_indices] = True
-
+    # Start with a base classification using RTTYP alone
     jurisdiction = pd.Series("County", index=roads_gdf.index)
-    jurisdiction[inside_city] = "Municipal"
+    jurisdiction[rttyp == "M"] = "Municipal"
+    jurisdiction[rttyp == "C"] = "County"
     jurisdiction[rttyp.isin(["I", "U", "S"]) | mtfcc.isin(["S1100"])] = "MoDOT"
 
-    roads = roads_gdf.copy()
-    roads["JURISDICTION"] = jurisdiction
+    # For segments with no RTTYP, do a spatial join against city limits
+    # to catch unnamed city streets that weren't tagged in TIGER
+    unclassified_mask = (rttyp == "") & (jurisdiction == "County")
+    if unclassified_mask.any():
+        unclassified = roads_proj[unclassified_mask][["geometry"]].copy()
+        unclassified["geometry"] = unclassified.geometry.centroid
+
+        in_muni = gpd.sjoin(
+            unclassified,
+            munis_proj[["geometry"]],
+            how="left",
+            predicate="within"
+        )
+        inside_city_indices = in_muni[in_muni["index_right"].notna()].index
+        jurisdiction[inside_city_indices] = "Municipal"
+
+    roads_out = roads_gdf.copy()
+    roads_out["JURISDICTION"] = jurisdiction
 
     print("  Results:")
     for k, v in jurisdiction.value_counts().items():
         print(f"    {k}: {v} segments")
-    return roads
+    return roads_out
 
 
 def round_coords(geojson_dict, precision=5):
