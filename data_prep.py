@@ -206,16 +206,13 @@ def enrich_with_osm_names(roads_gdf, osm_gdf):
 
 def classify_roads(roads_gdf, municipal_gdf):
     """
-    Classification rules (priority order):
-      1. RTTYP I/U/S or MTFCC S1100  -> MoDOT  (state route designation)
-      2. Centroid inside city limits  -> Municipal
-      3. Everything else              -> County Commission
-
-    IMPORTANT: RTTYP=M in TIGER means "municipal route number system" (a
-    numbering convention), NOT "maintained by a municipality."  Many rural
-    county roads carry RTTYP=M simply because they follow a municipal route
-    number.  Spatial containment within incorporated city limits is the only
-    reliable signal for municipal maintenance responsibility.
+    Classification rules:
+      RTTYP I/U/S                          -> MoDOT
+      RTTYP C                              -> County (always, never Municipal)
+      RTTYP M AND centroid inside city     -> Municipal
+      RTTYP M AND centroid outside city    -> County
+      RTTYP '' AND centroid inside city    -> Municipal
+      RTTYP '' AND centroid outside city   -> County
     """
     print("Classifying road segments...")
 
@@ -223,25 +220,20 @@ def classify_roads(roads_gdf, municipal_gdf):
     munis_proj = municipal_gdf.to_crs("EPSG:3857")
 
     rttyp = roads_gdf["RTTYP"].fillna("") if "RTTYP" in roads_gdf.columns else pd.Series("", index=roads_gdf.index)
-    mtfcc = roads_gdf["MTFCC"].fillna("") if "MTFCC" in roads_gdf.columns else pd.Series("", index=roads_gdf.index)
 
-    # Spatial join: which road centroids fall inside a city boundary?
+    # Spatial join all road centroids against city limits
     centroids = roads_proj[["geometry"]].copy()
     centroids["geometry"] = roads_proj.geometry.centroid
-
-    in_muni = gpd.sjoin(
-        centroids,
-        munis_proj[["geometry"]],
-        how="left",
-        predicate="within"
-    )
+    in_muni = gpd.sjoin(centroids, munis_proj[["geometry"]], how="left", predicate="within")
     inside_city = pd.Series(False, index=roads_gdf.index)
     inside_city[in_muni[in_muni["index_right"].notna()].index] = True
 
-    # Apply priority rules
     jurisdiction = pd.Series("County", index=roads_gdf.index)
-    jurisdiction[rttyp.isin(["I", "U", "S"]) | mtfcc.isin(["S1100"])] = "MoDOT"
-    jurisdiction[inside_city & (jurisdiction != "MoDOT")] = "Municipal"
+    jurisdiction[rttyp.isin(["I", "U", "S"])]          = "MoDOT"
+    jurisdiction[rttyp == "C"]                          = "County"
+    jurisdiction[(rttyp == "M") & inside_city]          = "Municipal"
+    jurisdiction[(rttyp == "M") & ~inside_city]         = "County"
+    jurisdiction[(rttyp == "") & inside_city]           = "Municipal"
 
     roads_out = roads_gdf.copy()
     roads_out["JURISDICTION"] = jurisdiction
