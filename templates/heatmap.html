@@ -28,15 +28,11 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
 .leg-item{display:flex;align-items:center;gap:5px;margin-bottom:3px}
 .leg-swatch{width:11px;height:11px;border-radius:2px;flex-shrink:0;border:1px solid rgba(255,255,255,0.15);margin-top:2px}
 .leg-text{font-size:12px;color:#c0d0e0;line-height:1.3}
-.leg-sub{font-size:10px;color:#5a7a9a;margin-top:2px;display:block}
-/* Tooltip for ⓘ */
-.info-icon{display:inline-block;cursor:help;color:#5a8abf;font-size:11px;font-weight:700;margin-left:4px;position:relative}
-.info-icon .tip{display:none;position:absolute;right:18px;top:-4px;width:200px;background:#0d1825;border:1px solid rgba(90,138,191,0.4);border-radius:6px;padding:8px 10px;font-size:11px;color:#c0d0e0;line-height:1.45;z-index:9999;font-weight:400;white-space:normal;box-shadow:0 4px 16px rgba(0,0,0,0.6)}
-.info-icon:hover .tip{display:block}
+.leg-sub{font-size:10px;color:#5a7a9a;margin-top:2px;display:block}.leg-desc{font-size:10px;color:#8a9ab0;margin-top:2px;margin-bottom:1px;display:block;line-height:1.4}
+
 
 #info-bar{position:absolute;top:10px;left:10px;z-index:1001;padding:14px 18px;width:300px}
-#breakdown{position:absolute;top:50%;left:10px;transform:translateY(-50%);z-index:1001;padding:14px 16px;width:300px}
-#breakdown{position:absolute;top:50%;left:10px;transform:translateY(-50%);z-index:1001;padding:14px 16px;width:300px}
+
 #info-bar h1{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px}
 #info-bar p{font-size:12px;color:#6a8aaa;line-height:1.4}
 .loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2000;background:rgba(15,22,36,0.97);padding:24px 36px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.6);text-align:center;color:#c8d8e8;font-size:14px;border:1px solid rgba(255,255,255,0.1)}
@@ -82,7 +78,6 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
 
   /* Hide desktop legend and breakdown panels */
   #legend { display: none; }
-  #breakdown { display: none; }
 
   /* Info bar - compact title only, top left */
   #info-bar {
@@ -121,7 +116,6 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
   /* Popup */
   .leaflet-popup-content { width: 260px !important; font-size: 12px; }
   .px-tbl td { padding: 4px; }
-  .info-icon .tip { left: auto; right: 0; width: 180px; font-size: 10px; }
 
   /* Zoom control clear of info-bar */
   .leaflet-control-zoom { margin-top: 60px !important; }
@@ -180,9 +174,7 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
   <h1>Clinton County Tax Heat Map 2025</h1>
   <p>Combined RE &amp; PP tax · click any parcel for detail</p>
 </div>
-<div id="breakdown" class="panel">
-  <div id="breakdown-content"></div>
-</div>
+
 <div id="controls" class="panel">
   <h2>⚙ Map Controls</h2>
   <div class="ctrl-section">
@@ -281,12 +273,12 @@ function buildPopup(pn){
 
 const LEGENDS={
   category:{title:'Property Category',html:`
-    <div class="leg-item"><div class="leg-swatch" style="background:#dc2626"></div><div class="leg-text">Municipal Residential<span class="info-icon">ⓘ<span class="tip">Residential parcels inside city limits, 9 acres or less. Highest combined tax source at $9.46M.</span></span><div class="leg-sub">5,697 parcels · $9.46M combined</div></div></div>
-    <div class="leg-item"><div class="leg-swatch" style="background:#60a5fa"></div><div class="leg-text">Small Residential<span class="info-icon">ⓘ<span class="tip">Residential parcels outside city limits, 9 acres or less. Rural homes and small rural lots.</span></span><div class="leg-sub">1,876 parcels · $5.56M combined</div></div></div>
-    <div class="leg-item"><div class="leg-swatch" style="background:#16a34a"></div><div class="leg-text">Agricultural with Homestead<span class="info-icon">ⓘ<span class="tip">Residential parcels over 9 acres — farmsteads with a house. Agricultural scale with a residential structure.</span></span><div class="leg-sub">1,913 parcels · $6.08M combined</div></div></div>
-    <div class="leg-item"><div class="leg-swatch" style="background:#ea580c"></div><div class="leg-text">Commercial<span class="info-icon">ⓘ<span class="tip">Any parcel with commercial assessed value — businesses, retail, industrial, rental properties.</span></span><div class="leg-sub">620 parcels · $2.31M combined</div></div></div>
-    <div class="leg-item"><div class="leg-swatch" style="background:#6b7280"></div><div class="leg-text">Agriculture without Homestead<span class="info-icon">ⓘ<span class="tip">Agricultural land with no residential structure — raw cropland, pasture, timber, vacant rural land.</span></span><div class="leg-sub">2,502 parcels · $1.03M combined</div></div></div>
-    <div class="leg-item"><div class="leg-swatch" style="background:#1a1a2e;border-color:#555"></div><div class="leg-text" style="color:#666">No tax record</div></div>`},
+    <div class="leg-item"><div class="leg-swatch" style="background:#dc2626;margin-top:3px"></div><div class="leg-text">Municipal Residential<div class="leg-desc">Residential parcels inside city limits, ≤9 acres.</div><div class="leg-sub">5,697 parcels · $9.46M combined</div></div></div>
+    <div class="leg-item"><div class="leg-swatch" style="background:#60a5fa;margin-top:3px"></div><div class="leg-text">Small Tract Residential<div class="leg-desc">Residential parcels outside city limits, ≤9 acres.</div><div class="leg-sub">1,876 parcels · $5.56M combined</div></div></div>
+    <div class="leg-item"><div class="leg-swatch" style="background:#16a34a;margin-top:3px"></div><div class="leg-text">Agricultural with Homestead<div class="leg-desc">Residential parcels &gt;9 acres — farmsteads with a dwelling.</div><div class="leg-sub">1,913 parcels · $6.08M combined</div></div></div>
+    <div class="leg-item"><div class="leg-swatch" style="background:#ea580c;margin-top:3px"></div><div class="leg-text">Commercial<div class="leg-desc">Any parcel with commercial assessed value — businesses, retail, industrial, rental.</div><div class="leg-sub">620 parcels · $2.31M combined</div></div></div>
+    <div class="leg-item"><div class="leg-swatch" style="background:#6b7280;margin-top:3px"></div><div class="leg-text">Agriculture without Homestead<div class="leg-desc">Agricultural land with no residential structure — cropland, pasture, timber.</div><div class="leg-sub">2,502 parcels · $1.03M combined</div></div></div>
+    <div class="leg-item"><div class="leg-swatch" style="background:#1a1a2e;border-color:#555;margin-top:3px"></div><div class="leg-text" style="color:#666">No tax record</div></div>`},
   per_acre:{title:'Combined Tax per Acre',html:`
     <div class="legend-bar" style="background:linear-gradient(to right,#fff1f2,#fca5a5,#ef4444,#b91c1c,#7f1d1d)"></div>
     <div class="legend-labels"><span>$100</span><span>$500</span><span>$1.5K</span><span>$5K+</span></div>
@@ -294,87 +286,24 @@ const LEGENDS={
     <div style="margin-top:4px;font-size:10px;color:#666">Small residential lots brightest — high revenue per acre vs. large rural parcels</div>`}
 };
 
-const BREAKDOWNS={
-  category:`
-    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.08)">2025 Tax Revenue by Category</div>
-    <div style="font-size:13px;color:#7fcfff;font-weight:700;margin-bottom:12px;line-height:1.4">Municipal Residential is Clinton County's #1 tax revenue source</div>
-    <div style="margin-bottom:8px">
-      <div style="font-size:13px;margin-bottom:4px;display:flex;justify-content:space-between"><span style="color:#dc2626;font-weight:700">Municipal Residential</span><span style="color:#7fcfff;font-weight:700">$9.46M</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:100%;height:100%;background:#dc2626;border-radius:3px"></div></div>
-      <div style="font-size:11px;color:#5a7a9a;margin-top:3px">5,697 parcels · in-city · ≤9 acres</div>
-    </div>
-    <div style="margin-bottom:8px">
-      <div style="font-size:13px;margin-bottom:4px;display:flex;justify-content:space-between"><span style="color:#16a34a;font-weight:700">Agricultural with Homestead</span><span style="color:#7fcfff;font-weight:700">$6.08M</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:64%;height:100%;background:#16a34a;border-radius:3px"></div></div>
-      <div style="font-size:11px;color:#5a7a9a;margin-top:3px">1,913 parcels · residential · >9 acres</div>
-    </div>
-    <div style="margin-bottom:8px">
-      <div style="font-size:13px;margin-bottom:4px;display:flex;justify-content:space-between"><span style="color:#2563eb;font-weight:700">Small Tract Residential</span><span style="color:#7fcfff;font-weight:700">$5.56M</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:59%;height:100%;background:#2563eb;border-radius:3px"></div></div>
-      <div style="font-size:11px;color:#5a7a9a;margin-top:3px">1,876 parcels · rural · ≤9 acres</div>
-    </div>
-    <div style="margin-bottom:8px">
-      <div style="font-size:13px;margin-bottom:4px;display:flex;justify-content:space-between"><span style="color:#ea580c;font-weight:700">Commercial</span><span style="color:#7fcfff;font-weight:700">$2.31M</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:24%;height:100%;background:#ea580c;border-radius:3px"></div></div>
-      <div style="font-size:11px;color:#5a7a9a;margin-top:3px">620 parcels · commercial assessed value</div>
-    </div>
-    <div style="margin-bottom:4px">
-      <div style="font-size:13px;margin-bottom:4px;display:flex;justify-content:space-between"><span style="color:#6b7280;font-weight:700">Agriculture without Homestead</span><span style="color:#7fcfff;font-weight:700">$1.03M</span></div>
-      <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:12px;overflow:hidden"><div style="width:11%;height:100%;background:#6b7280;border-radius:3px"></div></div>
-      <div style="font-size:11px;color:#5a7a9a;margin-top:3px">2,502 parcels · no residence · avg 62 acres</div>
-    </div>
-    <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:10px;color:#7fb3d3;line-height:1.5">Includes RE + matched PP tax. $1.83M PP from non-landowners not shown above.</div>`,
 
-  per_acre:`
-    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.08)">Tax Revenue per Acre</div>
-    <div style="font-size:13px;color:#7fcfff;font-weight:700;margin-bottom:14px;line-height:1.4">Small city lots generate dramatically more tax per acre than rural land</div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-      <span style="font-size:13px;color:#c0d0e0;font-weight:700">Municipal Residential</span>
-      <span style="font-size:14px;color:#ffffff;font-weight:700">$3,087/ac</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-      <span style="font-size:13px;color:#c0d0e0;font-weight:700">Commercial</span>
-      <span style="font-size:14px;color:#ffffff;font-weight:700">$317/ac</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-      <span style="font-size:13px;color:#c0d0e0;font-weight:700">Small Tract Residential</span>
-      <span style="font-size:14px;color:#ffffff;font-weight:700">$780/ac</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-      <span style="font-size:13px;color:#c0d0e0;font-weight:700">Agricultural with Homestead</span>
-      <span style="font-size:14px;color:#ffffff;font-weight:700">$70/ac</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-      <span style="font-size:13px;color:#c0d0e0;font-weight:700">Agriculture without Homestead</span>
-      <span style="font-size:14px;color:#ffffff;font-weight:700">$7/ac</span>
-    </div>
-    <div style="padding-top:10px;font-size:11px;color:#7fb3d3;line-height:1.5">Municipal Residential generates 441x more tax per acre than Agriculture without Homestead. Darker red on map = higher revenue per acre.</div>`
-};
-
-function updateBreakdown(mode){
-  const el = document.getElementById('breakdown-content');
-  if(el) el.innerHTML = BREAKDOWNS[mode] || '';
-}
 
 function updateLegend(mode){
   document.getElementById('leg-title').textContent=LEGENDS[mode].title;
-  document.getElementById('leg-body').innerHTML=LEGENDS[mode].html+`<div style="margin-top:9px;padding-top:7px;border-top:1px solid rgba(255,255,255,0.1);font-size:10px;color:#4a6a8a;line-height:1.5">      <b style="color:#5a8abf">PP coverage: 71.9%</b>      <span class="info-icon">ⓘ<span class="tip" style="left:auto;right:18px">71.9% of total PP tax ($4.67M of $6.49M) was matched to a RE parcel by name + tax code. Each PP account assigned to owner\\'s primary parcel only — no double counting. Remaining $1.83M belongs to renters and non-landowners.</span></span><br>      Clinton County\\'s full 2025 tax levy of ~$26.3M is completely accounted for — $24.4M mapped to parcels, $1.83M identified as PP tax from non-landowners who rent or hold no real estate in the county.    </div>`; 
+  document.getElementById('leg-body').innerHTML=LEGENDS[mode].html+`<div style="margin-top:9px;padding-top:7px;border-top:1px solid rgba(255,255,255,0.1);font-size:10px;color:#4a6a8a;line-height:1.6"><b style="color:#5a8abf">PP coverage: 71.9%</b> — 71.9% of total PP tax ($4.67M of $6.49M) matched to a RE parcel by name + tax code. Each PP account assigned to owner's primary parcel only, no double counting. Remaining $1.83M belongs to renters and non-landowners.<br><br>Clinton County's full 2025 tax levy of ~$26.3M is completely accounted for — $24.4M mapped to parcels, $1.83M identified as PP tax from non-landowners.</div>`; 
 }
 function setMode(btn){
   currentMode=btn.dataset.mode;
   document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   updateLegend(currentMode);
-  updateBreakdown(currentMode);
   if(parcelLayer)parcelLayer.setStyle(getStyle);
   // keep mobile legend sheet in sync if open
   const sheet=document.getElementById('mobile-legend-sheet');
   if(sheet&&sheet.classList.contains('open')){
     document.getElementById('mob-leg-title').textContent=LEGENDS[currentMode].title;
     document.getElementById('mob-leg-body').innerHTML=
-      LEGENDS[currentMode].html +
-      '<div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);font-size:12px;color:#5a8abf;line-height:1.6">' +
-      (BREAKDOWNS[currentMode]||'') + '</div>';
+      LEGENDS[currentMode].html;
   }
 }
 
@@ -481,9 +410,7 @@ function toggleMobileLegend(){
     // Sync content with current mode
     document.getElementById('mob-leg-title').textContent=LEGENDS[currentMode].title;
     document.getElementById('mob-leg-body').innerHTML=
-      LEGENDS[currentMode].html +
-      '<div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);font-size:12px;color:#5a8abf;line-height:1.6">' +
-      (BREAKDOWNS[currentMode]||'') + '</div>';
+      LEGENDS[currentMode].html;
     // close controls if open
     document.getElementById('controls').classList.remove('mobile-open');
     document.getElementById('mobile-menu-btn').textContent='⚙';
@@ -502,21 +429,7 @@ document.querySelectorAll('.mode-btn,.toggle-btn').forEach(btn=>{
   });
 });
 
-// On mobile, make ⓘ tips work on tap
-if('ontouchstart' in window){
-  document.querySelectorAll('.info-icon').forEach(el=>{
-    el.addEventListener('click',function(e){
-      e.stopPropagation();
-      const tip=this.querySelector('.tip');
-      const isOpen=tip.style.display==='block';
-      document.querySelectorAll('.info-icon .tip').forEach(t=>t.style.display='none');
-      tip.style.display=isOpen?'none':'block';
-    });
-  });
-  document.addEventListener('click',function(){
-    document.querySelectorAll('.info-icon .tip').forEach(t=>t.style.display='none');
-  });
-}
+
 </script>
 </body>
 </html>
