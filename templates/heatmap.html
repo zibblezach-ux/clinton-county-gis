@@ -80,7 +80,7 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
   .mode-btn { padding: 8px 10px; font-size: 13px; }
   .toggle-btn { padding: 6px 10px; font-size: 12px; margin-bottom: 5px; }
 
-  /* Hide legend and breakdown entirely - too much clutter */
+  /* Hide desktop legend and breakdown panels */
   #legend { display: none; }
   #breakdown { display: none; }
 
@@ -93,8 +93,30 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
   #info-bar h1 { font-size: 11px; margin: 0; }
   #info-bar p { display: none; }
 
-  /* FAB */
-  #mobile-menu-btn { display: flex !important; }
+  /* Both FABs */
+  #mobile-menu-btn { display: flex !important; bottom: 80px; }
+  #mobile-legend-btn { display: flex !important; }
+
+  /* Mobile legend bottom sheet */
+  #mobile-legend-sheet {
+    display: block;
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 1003;
+    background: rgba(15,22,36,0.97);
+    border-radius: 12px 12px 0 0;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding: 14px 16px 28px;
+    transform: translateY(110%);
+    transition: transform 0.22s ease;
+    max-height: 70vh; overflow-y: auto;
+    color: #c0d0e0;
+  }
+  #mobile-legend-sheet.open { transform: translateY(0); }
+  #mob-leg-close {
+    float: right; background: #1a2535; color: #c0d0e0;
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
+    padding: 5px 10px; font-size: 13px; font-weight: bold; cursor: pointer;
+  }
+  #mob-leg-title { font-size: 13px; font-weight: 700; color: #5a8abf; text-transform: uppercase; letter-spacing: .06em; margin: 0 0 12px; clear: both; padding-top: 4px; }
 
   /* Popup */
   .leaflet-popup-content { width: 260px !important; font-size: 12px; }
@@ -105,29 +127,48 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
   .leaflet-control-zoom { margin-top: 60px !important; }
 }
 
-/* Hamburger button - hidden on desktop */
+/* FABs - hidden on desktop */
 #mobile-menu-btn {
   display: none;
   position: fixed;
-  bottom: 12px;
+  bottom: 80px;
   right: 12px;
   z-index: 1003;
   background: #1a4a8a;
   border: 1px solid #3a7aca;
   border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  align-items: center;
-  justify-content: center;
+  width: 48px; height: 48px;
+  align-items: center; justify-content: center;
   cursor: pointer;
   box-shadow: 0 3px 12px rgba(0,0,0,0.5);
-  font-size: 20px;
-  color: white;
+  font-size: 20px; color: white;
+}
+#mobile-legend-btn {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 12px;
+  z-index: 1003;
+  background: #1a4a8a;
+  border: 1px solid #3a7aca;
+  border-radius: 50%;
+  width: 48px; height: 48px;
+  align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.5);
+  font-size: 20px; color: white;
 }
 </style>
 </head>
 <body>
 <button id="mobile-menu-btn" onclick="toggleMobileMenu()" title="Map Controls">⚙</button>
+<button id="mobile-legend-btn" onclick="toggleMobileLegend()" title="Legend &amp; Category">📋</button>
+
+<div id="mobile-legend-sheet">
+  <button id="mob-leg-close" onclick="toggleMobileLegend()">Close</button>
+  <div id="mob-leg-title">Property Category</div>
+  <div id="mob-leg-body"></div>
+</div>
 <div class="loading" id="loading">
   <div style="font-size:26px;margin-bottom:10px">🔥</div>
   <div>Initializing map data<span class="dot-anim"></span></div>
@@ -326,6 +367,15 @@ function setMode(btn){
   updateLegend(currentMode);
   updateBreakdown(currentMode);
   if(parcelLayer)parcelLayer.setStyle(getStyle);
+  // keep mobile legend sheet in sync if open
+  const sheet=document.getElementById('mobile-legend-sheet');
+  if(sheet&&sheet.classList.contains('open')){
+    document.getElementById('mob-leg-title').textContent=LEGENDS[currentMode].title;
+    document.getElementById('mob-leg-body').innerHTML=
+      LEGENDS[currentMode].html +
+      '<div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);font-size:12px;color:#5a8abf;line-height:1.6">' +
+      (BREAKDOWNS[currentMode]||'') + '</div>';
+  }
 }
 
 function toggleOverlay(k){
@@ -419,6 +469,25 @@ function toggleMobileMenu(){
   const btn=document.getElementById('mobile-menu-btn');
   c.classList.toggle('mobile-open');
   btn.textContent=c.classList.contains('mobile-open')?'✕':'⚙';
+  // close legend sheet if open
+  document.getElementById('mobile-legend-sheet').classList.remove('open');
+}
+
+// Mobile legend/breakdown sheet
+function toggleMobileLegend(){
+  const sheet=document.getElementById('mobile-legend-sheet');
+  const isOpen=sheet.classList.toggle('open');
+  if(isOpen){
+    // Sync content with current mode
+    document.getElementById('mob-leg-title').textContent=LEGENDS[currentMode].title;
+    document.getElementById('mob-leg-body').innerHTML=
+      LEGENDS[currentMode].html +
+      '<div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);font-size:12px;color:#5a8abf;line-height:1.6">' +
+      (BREAKDOWNS[currentMode]||'') + '</div>';
+    // close controls if open
+    document.getElementById('controls').classList.remove('mobile-open');
+    document.getElementById('mobile-menu-btn').textContent='⚙';
+  }
 }
 
 // Close controls when a mode is selected on mobile
