@@ -13,22 +13,30 @@
     html, body { margin: 0; padding: 0; height: 100%; width: 100%; font-family: Arial, sans-serif; overflow: hidden; }
     #map { width: 100%; height: 100vh; }
     .leaflet-control-layers { font-size: 14px; max-height: 350px; overflow-y: auto; }
+
     .back-btn {
       position: absolute; top: 10px; left: 10px; z-index: 1001;
       background: rgba(255,255,255,0.95); color: #222;
-      border: 1px solid #ccc; border-radius: 6px;
-      padding: 8px 14px; font-size: 13px; cursor: pointer;
-      text-decoration: none; display: inline-block;
+      border: 1px solid #ccc; border-radius: 6px; padding: 8px 14px;
+      font-size: 13px; cursor: pointer; text-decoration: none; display: inline-block;
       box-shadow: 0 0 6px rgba(0,0,0,0.2);
     }
     .back-btn:hover { background: #f0f0f0; }
+
+    .info-panel {
+      position: absolute; top: 50px; left: 10px; z-index: 1000;
+      background: rgba(255,255,255,0.95); padding: 10px 14px;
+      border-radius: 6px; box-shadow: 0 0 8px rgba(0,0,0,0.3);
+      font-size: 14px; max-width: 320px;
+    }
+    .info-title { font-weight: bold; font-size: 16px; margin-bottom: 6px; }
+
     .city-label { background: transparent; border: none; box-shadow: none; color: #4b0082; font-size: 12px; font-weight: bold; }
     .township-label { background: transparent; border: none; box-shadow: none; color: #0033aa; font-size: 11px; font-weight: bold; white-space: nowrap; }
     .school-label { background: transparent; border: none; box-shadow: none; color: #006600; font-size: 14px; font-weight: bold; white-space: nowrap; text-align: center; }
     .water-label { background: transparent; border: none; box-shadow: none; color: #005f87; font-size: 14px; font-weight: bold; white-space: nowrap; text-align: center; width: auto !important; height: auto !important; line-height: 1.2; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; }
     .fire-label { background: transparent; border: none; box-shadow: none; color: #cc0000; font-size: 13px; font-weight: bold; white-space: nowrap; text-align: center; width: auto !important; height: auto !important; line-height: 1.2; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; }
-    .info-panel { position: absolute; top: 50px; left: 10px; z-index: 1000; background: rgba(255,255,255,0.95); padding: 10px 14px; border-radius: 6px; box-shadow: 0 0 8px rgba(0,0,0,0.3); font-size: 14px; max-width: 320px; }
-    .info-title { font-weight: bold; font-size: 16px; margin-bottom: 6px; }
+
     .tax-popup table { border-collapse: collapse; width: 100%; font-size: 13px; }
     .tax-popup th, .tax-popup td { border-bottom: 1px solid #ddd; padding: 3px 5px; text-align: left; vertical-align: top; }
     .tax-popup th { font-weight: bold; background: #f5f5f5; }
@@ -37,12 +45,60 @@
     .parcel-popup-title { font-weight: bold; font-size: 15px; margin-bottom: 8px; }
     .parcel-popup-row { margin-bottom: 7px; }
     .parcel-popup-label { font-weight: bold; }
+
+    /* ── Mobile ── */
+    @media (max-width: 700px) {
+      .info-panel { display: none; }
+      .leaflet-control-layers { display: none !important; }
+      .leaflet-control-geocoder { display: none !important; }
+      .back-btn { top: 10px; left: 10px; font-size: 13px; padding: 8px 12px; }
+
+      #mobile-panel {
+        display: block;
+        position: fixed; bottom: 0; left: 0; right: 0; z-index: 3000;
+        background: rgba(255,255,255,0.98); color: #222;
+        border-radius: 14px 14px 0 0;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.18);
+        padding: 14px 16px 28px;
+        transform: translateY(110%);
+        transition: transform 0.22s ease;
+        max-height: 70vh; overflow-y: auto;
+      }
+      #mobile-panel.open { transform: translateY(0); }
+      #mobile-panel h3 { margin: 0 0 4px; font-size: 15px; font-weight: bold; }
+      #mobile-panel p { margin: 0 0 12px; font-size: 12px; color: #666; }
+      .mob-close {
+        float: right; background: #eee; color: #333;
+        border: none; border-radius: 6px; padding: 5px 10px;
+        font-size: 13px; font-weight: bold; cursor: pointer;
+      }
+      .mob-layer { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+      .mob-layer:last-child { border-bottom: none; }
+      .mob-layer input[type=checkbox] { width: 18px; height: 18px; cursor: pointer; flex-shrink: 0; }
+
+      #mob-fab {
+        display: flex;
+        position: fixed; bottom: 20px; right: 16px; z-index: 2000;
+        width: 50px; height: 50px; border-radius: 50%;
+        background: rgba(255,255,255,0.97); color: #333;
+        border: 1px solid #ccc; font-size: 22px;
+        align-items: center; justify-content: center;
+        cursor: pointer; box-shadow: 0 3px 12px rgba(0,0,0,0.2);
+      }
+      .leaflet-control-zoom { margin-top: 60px !important; }
+    }
+
+    @media (min-width: 701px) {
+      #mobile-panel { display: none; }
+      #mob-fab { display: none; }
+    }
   </style>
 </head>
 <body>
 
 <a class="back-btn" href="/">← Back</a>
 
+<!-- Desktop info panel -->
 <div class="info-panel">
   <div class="info-title">Community Districts GIS</div>
   Base infrastructure GIS viewer
@@ -50,36 +106,36 @@
 
 <div id="map"></div>
 
+<!-- Mobile FAB -->
+<button id="mob-fab" onclick="toggleMobPanel()" title="Layers">☰</button>
+
+<!-- Mobile bottom sheet -->
+<div id="mobile-panel">
+  <button class="mob-close" onclick="toggleMobPanel()">Close</button>
+  <h3>Community Districts GIS</h3>
+  <p>Toggle layers</p>
+  <div class="mob-layer"><input type="checkbox" id="m-roads" checked><label for="m-roads">Roads</label></div>
+  <div class="mob-layer"><input type="checkbox" id="m-cities"><label for="m-cities">Cities</label></div>
+  <div class="mob-layer"><input type="checkbox" id="m-townships"><label for="m-townships">Townships</label></div>
+  <div class="mob-layer"><input type="checkbox" id="m-flood"><label for="m-flood">Flood Zones</label></div>
+  <div class="mob-layer"><input type="checkbox" id="m-schools"><label for="m-schools">School Districts</label></div>
+  <div class="mob-layer"><input type="checkbox" id="m-parcels"><label for="m-parcels">Parcels</label></div>
+  <div class="mob-layer"><input type="checkbox" id="m-salestax"><label for="m-salestax">Sales Tax</label></div>
+  <div class="mob-layer"><input type="checkbox" id="m-water"><label for="m-water">Water Districts</label></div>
+  <div class="mob-layer"><input type="checkbox" id="m-fire"><label for="m-fire">Fire Districts</label></div>
+</div>
+
 <script>
 const MISSOURI_STATE_RATE = 4.225;
-
 const countyBounds = [[39.15, -95.05], [39.95, -93.85]];
-
-const map = L.map('map', {
-  maxBounds: countyBounds,
-  maxBoundsViscosity: 0.45,
-  preferCanvas: true
-});
-
+const map = L.map('map', { maxBounds: countyBounds, maxBoundsViscosity: 0.45, preferCanvas: true });
 map.setView([39.58, -94.50], 10.75);
 
-const esri = L.tileLayer(
-  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
-  { maxZoom: 19, attribution: 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, USGS, and the GIS User Community' }
-).addTo(map);
-
-const osm = L.tileLayer(
-  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }
-);
-
-const satellite = L.tileLayer(
-  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-  { maxZoom: 19, attribution: 'Tiles &copy; Esri &mdash; Esri, i-cubed, USDA, USGS, AEX, GeoEye' }
-);
+const esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles &copy; Esri' }).addTo(map);
+const osm  = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' });
+const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles &copy; Esri' });
 
 L.control.scale().addTo(map);
-
 L.Control.geocoder({ defaultMarkGeocode: true }).addTo(map);
 
 const roadsLayer      = L.layerGroup().addTo(map);
@@ -96,22 +152,12 @@ let salesTaxFeatures = [];
 let parcelGeoJsonLayer = null;
 
 const overlays = {
-  "Roads":           roadsLayer,
-  "Cities":          citiesLayer,
-  "Townships":       townshipsLayer,
-  "Flood Zones":     floodLayer,
-  "School Districts":schoolLayer,
-  "Parcels":         parcelsLayer,
-  "Sales Tax":       salesTaxLayer,
-  "Water Districts": waterLayer,
-  "Fire Districts":  fireLayer
+  "Roads": roadsLayer, "Cities": citiesLayer, "Townships": townshipsLayer,
+  "Flood Zones": floodLayer, "School Districts": schoolLayer,
+  "Parcels": parcelsLayer, "Sales Tax": salesTaxLayer,
+  "Water Districts": waterLayer, "Fire Districts": fireLayer
 };
-
-L.control.layers(
-  { 'ESRI Street': esri, 'OpenStreetMap': osm, 'ESRI Satellite': satellite },
-  overlays,
-  { collapsed: false }
-).addTo(map);
+L.control.layers({ 'ESRI Street': esri, 'OpenStreetMap': osm, 'ESRI Satellite': satellite }, overlays, { collapsed: false }).addTo(map);
 
 async function loadLayer(url, target, options, label) {
   try {
@@ -121,211 +167,147 @@ async function loadLayer(url, target, options, label) {
     const geo = L.geoJSON(data, options);
     geo.addTo(target);
     return geo;
-  } catch (err) {
-    console.error(label + ' failed:', err);
-    return null;
-  }
+  } catch (err) { console.error(label + ' failed:', err); return null; }
 }
 
 function pointOnFeatureLatLng(feature) {
-  try {
-    const point = turf.pointOnFeature(feature);
-    return [point.geometry.coordinates[1], point.geometry.coordinates[0]];
-  } catch (err) { return null; }
+  try { const p = turf.pointOnFeature(feature); return [p.geometry.coordinates[1], p.geometry.coordinates[0]]; } catch(e) { return null; }
 }
-
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;").replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function formatRate(value) {
-  if (value === null || value === undefined || value === "") return "0";
-  const number = Number(value);
-  if (Number.isNaN(number)) return escapeHtml(value);
-  return number.toFixed(3);
-}
-
-function getFirstProperty(props, keys) {
-  for (const key of keys) {
-    if (props[key] !== undefined && props[key] !== null && String(props[key]).trim() !== "") {
-      return props[key];
-    }
-  }
-  return "";
-}
+function escapeHtml(v) { return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;"); }
+function formatRate(v) { if(v===null||v===undefined||v==='')return'0'; const n=Number(v); return Number.isNaN(n)?escapeHtml(v):n.toFixed(3); }
+function getFirstProperty(props, keys) { for(const k of keys){if(props[k]!==undefined&&props[k]!==null&&String(props[k]).trim()!=='')return props[k];}return ''; }
 
 function parcelPopupHtml(feature) {
   const props = feature.properties || {};
-  const parcelNumber = getFirstProperty(props, ["parcel_num","parcel_number","PARCEL_NUM","PARCEL_NUMBER"]);
-  const deedholder   = getFirstProperty(props, ["deedholder","DEEDHOLDER"]);
-  const acreage      = getFirstProperty(props, ["deeded_acr","DEEDED_ACR","acreage","ACRES"]);
+  const parcelNumber = getFirstProperty(props,['parcel_num','parcel_number','PARCEL_NUM','PARCEL_NUMBER']);
+  const deedholder   = getFirstProperty(props,['deedholder','DEEDHOLDER']);
+  const acreage      = getFirstProperty(props,['deeded_acr','DEEDED_ACR','acreage','ACRES']);
   let html = '<div class="parcel-popup"><div class="parcel-popup-title">Parcel Information</div>';
-  if (parcelNumber) html += '<div class="parcel-popup-row"><span class="parcel-popup-label">Parcel Number:</span><br>' + escapeHtml(parcelNumber) + '</div>';
-  if (deedholder)   html += '<div class="parcel-popup-row"><span class="parcel-popup-label">Deedholder:</span><br>' + escapeHtml(deedholder) + '</div>';
-  if (acreage)      html += '<div class="parcel-popup-row"><span class="parcel-popup-label">Deeded Acres:</span><br>' + escapeHtml(acreage) + '</div>';
-  if (!parcelNumber && !deedholder && !acreage) html += '<div class="parcel-popup-row">No parcel attribute data found.</div>';
-  html += '</div>';
-  return html;
+  if(parcelNumber) html+='<div class="parcel-popup-row"><span class="parcel-popup-label">Parcel Number:</span><br>'+escapeHtml(parcelNumber)+'</div>';
+  if(deedholder)   html+='<div class="parcel-popup-row"><span class="parcel-popup-label">Deedholder:</span><br>'+escapeHtml(deedholder)+'</div>';
+  if(acreage)      html+='<div class="parcel-popup-row"><span class="parcel-popup-label">Deeded Acres:</span><br>'+escapeHtml(acreage)+'</div>';
+  if(!parcelNumber&&!deedholder&&!acreage) html+='<div class="parcel-popup-row">No parcel attribute data found.</div>';
+  return html+'</div>';
 }
 
 function salesTaxPopupHtml(matches) {
-  if (!matches.length) return "<b>No sales tax polygon found at this point.</b>";
-  const uniqueMatches = [];
-  const seen = new Set();
-  matches.forEach(feature => {
-    const p = feature.properties || {};
-    const key = [p.JURISDICTION_NAME || "", p.JURISDICTION_TYPE || "", p.SALES_TAX || ""].join("|");
-    if (!seen.has(key)) { seen.add(key); uniqueMatches.push(feature); }
-  });
-  const rows = uniqueMatches.map(feature => {
-    const p = feature.properties || {};
-    return '<tr><td>' + escapeHtml(p.JURISDICTION_NAME || "") + '</td><td>' + escapeHtml(p.JURISDICTION_TYPE || "") + '</td><td>' + formatRate(p.SALES_TAX) + '%</td></tr>';
-  }).join("");
-  const localTotal = uniqueMatches.reduce((sum, feature) => {
-    const value = Number((feature.properties || {}).SALES_TAX);
-    return sum + (Number.isNaN(value) ? 0 : value);
-  }, 0);
-  const combinedTotal = MISSOURI_STATE_RATE + localTotal;
-  return '<div class="tax-popup"><b>Sales tax jurisdictions at this point</b><table><thead><tr><th>Jurisdiction</th><th>Type</th><th>Rate</th></tr></thead><tbody><tr><td>Missouri State</td><td>STATE</td><td>' + formatRate(MISSOURI_STATE_RATE) + '%</td></tr>' + rows + '</tbody></table><div class="tax-total"><b>Missouri State:</b> ' + formatRate(MISSOURI_STATE_RATE) + '%<br><b>Local Add-ons:</b> ' + formatRate(localTotal) + '%<br><b>Combined Total:</b> ' + formatRate(combinedTotal) + '%</div></div>';
+  if(!matches.length) return '<b>No sales tax polygon found at this point.</b>';
+  const uniqueMatches=[];const seen=new Set();
+  matches.forEach(f=>{const p=f.properties||{};const key=[p.JURISDICTION_NAME||'',p.JURISDICTION_TYPE||'',p.SALES_TAX||''].join('|');if(!seen.has(key)){seen.add(key);uniqueMatches.push(f);}});
+  const rows=uniqueMatches.map(f=>{const p=f.properties||{};return'<tr><td>'+escapeHtml(p.JURISDICTION_NAME||'')+'</td><td>'+escapeHtml(p.JURISDICTION_TYPE||'')+'</td><td>'+formatRate(p.SALES_TAX)+'%</td></tr>';}).join('');
+  const localTotal=uniqueMatches.reduce((s,f)=>{const v=Number((f.properties||{}).SALES_TAX);return s+(Number.isNaN(v)?0:v);},0);
+  const combinedTotal=MISSOURI_STATE_RATE+localTotal;
+  return '<div class="tax-popup"><b>Sales tax jurisdictions at this point</b><table><thead><tr><th>Jurisdiction</th><th>Type</th><th>Rate</th></tr></thead><tbody><tr><td>Missouri State</td><td>STATE</td><td>'+formatRate(MISSOURI_STATE_RATE)+'%</td></tr>'+rows+'</tbody></table><div class="tax-total"><b>Missouri State:</b> '+formatRate(MISSOURI_STATE_RATE)+'%<br><b>Local Add-ons:</b> '+formatRate(localTotal)+'%<br><b>Combined Total:</b> '+formatRate(combinedTotal)+'%</div></div>';
 }
 
 function handleSalesTaxMapClick(e) {
-  if (!map.hasLayer(salesTaxLayer)) return;
-  const clickPoint = turf.point([e.latlng.lng, e.latlng.lat]);
-  const matches = [];
-  for (const featureObj of salesTaxFeatures) {
-    try { if (featureObj && turf.booleanPointInPolygon(clickPoint, featureObj)) matches.push(featureObj); } catch(err) {}
-  }
+  if(!map.hasLayer(salesTaxLayer)) return;
+  const clickPoint=turf.point([e.latlng.lng,e.latlng.lat]);
+  const matches=[];
+  for(const f of salesTaxFeatures){try{if(f&&turf.booleanPointInPolygon(clickPoint,f))matches.push(f);}catch(err){}}
   map.closePopup();
   L.popup().setLatLng(e.latlng).setContent(salesTaxPopupHtml(matches)).openOn(map);
 }
 
 async function loadParcels() {
-  if (parcelGeoJsonLayer) parcelsLayer.removeLayer(parcelGeoJsonLayer);
-  parcelGeoJsonLayer = await loadLayer(
-    '/static/Parcels/parcels.geojson', parcelsLayer,
-    {
-      renderer: L.canvas(),
-      style: { color: '#444444', weight: 0.35, opacity: 0.45, fillColor: '#cccccc', fillOpacity: 0.02 },
-      onEachFeature: function(feature, layer) {
-        layer.on('click', function(e) {
-          L.popup().setLatLng(e.latlng).setContent(parcelPopupHtml(feature)).openOn(map);
-        });
-      }
-    }, 'Parcels'
-  );
+  if(parcelGeoJsonLayer) parcelsLayer.removeLayer(parcelGeoJsonLayer);
+  parcelGeoJsonLayer = await loadLayer('/static/Parcels/parcels.geojson', parcelsLayer, {
+    renderer: L.canvas(),
+    style: { color:'#444444',weight:0.35,opacity:0.45,fillColor:'#cccccc',fillOpacity:0.02 },
+    onEachFeature: function(feature,layer){ layer.on('click',function(e){ L.popup().setLatLng(e.latlng).setContent(parcelPopupHtml(feature)).openOn(map); }); }
+  }, 'Parcels');
 }
 
 async function loadMap() {
-  await loadLayer('/static/Roads/roads.geojson', roadsLayer,
-    { renderer: L.canvas(), style: { color: '#666666', weight: 0.7, opacity: 0.35, dashArray: '3,3' } }, 'Roads');
+  await loadLayer('/static/Roads/roads.geojson', roadsLayer, { renderer:L.canvas(), style:{color:'#666666',weight:0.7,opacity:0.35,dashArray:'3,3'} }, 'Roads');
 
-  await loadLayer('/static/Cities/cities.geojson', citiesLayer,
-    {
-      pointToLayer: (f, latlng) => L.circleMarker(latlng, { radius: 5, fillColor: '#7a00cc', color: '#000', weight: 1, fillOpacity: 0.85 }),
-      onEachFeature: (f, layer) => {
-        if (f.properties?.NAME) layer.bindTooltip(f.properties.NAME, { permanent: true, className: 'city-label' });
-      }
-    }, 'Cities');
+  await loadLayer('/static/Cities/cities.geojson', citiesLayer, {
+    pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:5,fillColor:'#7a00cc',color:'#000',weight:1,fillOpacity:0.85}),
+    onEachFeature:(f,layer)=>{ if(f.properties?.NAME) layer.bindTooltip(f.properties.NAME,{permanent:true,className:'city-label'}); }
+  }, 'Cities');
 
-  await loadLayer('/static/Townships/townships.geojson', townshipsLayer,
-    {
-      renderer: L.canvas(),
-      style: { color: '#0044ff', weight: 3, opacity: 1, fillOpacity: 0 },
-      onEachFeature: function(feature, layer) {
-        const name = feature.properties?.NAME || feature.properties?.NAMELSAD || "Township";
-        layer.bindTooltip(name, { permanent: true, direction: 'center', className: 'township-label' });
-      }
-    }, 'Townships');
+  await loadLayer('/static/Townships/townships.geojson', townshipsLayer, {
+    renderer:L.canvas(),
+    style:{color:'#0044ff',weight:3,opacity:1,fillOpacity:0},
+    onEachFeature:function(feature,layer){ const name=feature.properties?.NAME||feature.properties?.NAMELSAD||'Township'; layer.bindTooltip(name,{permanent:true,direction:'center',className:'township-label'}); }
+  }, 'Townships');
 
-  await loadLayer('/static/Floodzones/floodzones.geojson', floodLayer,
-    { renderer: L.canvas(), style: { color: '#0088ff', weight: 1, opacity: 0.7, fillOpacity: 0 } }, 'Flood');
+  await loadLayer('/static/Floodzones/floodzones.geojson', floodLayer, { renderer:L.canvas(), style:{color:'#0088ff',weight:1,opacity:0.7,fillOpacity:0} }, 'Flood');
 
-  await loadLayer('/static/school_districts/school_districts.geojson', schoolLayer,
-    {
-      renderer: L.canvas(),
-      style: { color: '#008800', weight: 3, opacity: 0.9, dashArray: '8,4', fillColor: '#b7e3b7', fillOpacity: 0.04 },
-      onEachFeature: function(feature, layer) {
-        const name = feature.properties?.NAME || "";
-        if (name) {
-          let opts = { permanent: true, direction: 'center', className: 'school-label' };
-          if (name.includes("Osborn")) opts.offset = [55, 14];
-          layer.bindTooltip(name, opts);
-        }
-      }
-    }, 'Schools');
+  await loadLayer('/static/school_districts/school_districts.geojson', schoolLayer, {
+    renderer:L.canvas(),
+    style:{color:'#008800',weight:3,opacity:0.9,dashArray:'8,4',fillColor:'#b7e3b7',fillOpacity:0.04},
+    onEachFeature:function(feature,layer){ const name=feature.properties?.NAME||''; if(name){let opts={permanent:true,direction:'center',className:'school-label'};if(name.includes('Osborn'))opts.offset=[55,14];layer.bindTooltip(name,opts);} }
+  }, 'Schools');
 
   await loadParcels();
+  salesTaxFeatures=[];
 
-  salesTaxFeatures = [];
+  map.on('overlayremove',function(e){
+    if(e.layer===salesTaxLayer) map.closePopup();
+    if(e.layer===parcelsLayer){map.closePopup();if(parcelGeoJsonLayer)parcelsLayer.removeLayer(parcelGeoJsonLayer);}
+  });
+  map.on('overlayadd',async function(e){ if(e.layer===parcelsLayer) await loadParcels(); });
+  map.off('click',handleSalesTaxMapClick);
+  map.on('click',handleSalesTaxMapClick);
 
-  map.on('overlayremove', function(e) {
-    if (e.layer === salesTaxLayer) map.closePopup();
-    if (e.layer === parcelsLayer) {
-      map.closePopup();
-      if (parcelGeoJsonLayer) parcelsLayer.removeLayer(parcelGeoJsonLayer);
+  await loadLayer('/static/Sales_tax/sales_tax.geojson', salesTaxLayer, {
+    renderer:L.canvas(),
+    style:{color:'#ff8800',weight:2,opacity:1,fillColor:'#ffaa33',fillOpacity:0.08},
+    onEachFeature:function(feature,layer){salesTaxFeatures.push(feature);}
+  }, 'Sales Tax');
+
+  await loadLayer('/static/Water/water.geojson', waterLayer, {
+    renderer:L.canvas(),
+    style:{color:'#006699',weight:2,opacity:1,fillOpacity:0},
+    onEachFeature:function(feature,layer){
+      const name=feature.properties?.PWSSNAME||'Water District';
+      const labelLatLng=pointOnFeatureLatLng(feature);
+      if(labelLatLng){
+        let adj=labelLatLng;
+        if(name.includes('DeKalb')) adj=[labelLatLng[0]-0.004,labelLatLng[1]-0.006];
+        waterLayer.addLayer(L.marker(adj,{interactive:false,icon:L.divIcon({className:'water-label',html:escapeHtml(name),iconSize:null})}));
+      }
     }
-  });
+  }, 'Water');
 
-  map.on('overlayadd', async function(e) {
-    if (e.layer === parcelsLayer) await loadParcels();
-  });
-
-  map.off('click', handleSalesTaxMapClick);
-  map.on('click', handleSalesTaxMapClick);
-
-  await loadLayer('/static/Sales_tax/sales_tax.geojson', salesTaxLayer,
-    {
-      renderer: L.canvas(),
-      style: { color: '#ff8800', weight: 2, opacity: 1, fillColor: '#ffaa33', fillOpacity: 0.08 },
-      onEachFeature: function(feature, layer) { salesTaxFeatures.push(feature); }
-    }, 'Sales Tax');
-
-  await loadLayer('/static/Water/water.geojson', waterLayer,
-    {
-      renderer: L.canvas(),
-      style: { color: '#006699', weight: 2, opacity: 1, fillOpacity: 0 },
-      onEachFeature: function(feature, layer) {
-        const name = feature.properties?.PWSSNAME || "Water District";
-        const labelLatLng = pointOnFeatureLatLng(feature);
-        if (labelLatLng) {
-          let adjustedLatLng = labelLatLng;
-          if (name.includes("DeKalb")) adjustedLatLng = [labelLatLng[0] - 0.004, labelLatLng[1] - 0.006];
-          const lbl = L.marker(adjustedLatLng, {
-            interactive: false,
-            icon: L.divIcon({ className: 'water-label', html: escapeHtml(name), iconSize: null })
-          });
-          waterLayer.addLayer(lbl);
-        }
-      }
-    }, 'Water');
-
-  await loadLayer('/static/Fire/fire_district_boundaries.geojson', fireLayer,
-    {
-      renderer: L.canvas(),
-      style: { color: '#cc0000', weight: 3, opacity: 1, dashArray: '6,4', fillOpacity: 0 },
-      onEachFeature: function(feature, layer) {
-        const props = feature.properties || {};
-        const name = props.NAME || props.name || props.DISTRICT || props.district ||
-          props.FIRE_DIST || props.fire_dist || props.LABEL || props.label ||
-          props.FDNAME || props.fdname || props.AGENCY || props.agency || "Unnamed Fire District";
-        const labelLatLng = pointOnFeatureLatLng(feature);
-        if (labelLatLng) {
-          const lbl = L.marker(labelLatLng, {
-            interactive: false,
-            icon: L.divIcon({ className: 'fire-label', html: escapeHtml(name), iconSize: null })
-          });
-          fireLayer.addLayer(lbl);
-        }
-        layer.bindPopup('<b>' + escapeHtml(name) + '</b>');
-      }
-    }, 'Fire Districts');
+  await loadLayer('/static/Fire/fire_district_boundaries.geojson', fireLayer, {
+    renderer:L.canvas(),
+    style:{color:'#cc0000',weight:3,opacity:1,dashArray:'6,4',fillOpacity:0},
+    onEachFeature:function(feature,layer){
+      const props=feature.properties||{};
+      const name=props.NAME||props.name||props.DISTRICT||props.district||props.FIRE_DIST||props.fire_dist||props.LABEL||props.label||props.FDNAME||props.fdname||props.AGENCY||props.agency||'Unnamed Fire District';
+      const labelLatLng=pointOnFeatureLatLng(feature);
+      if(labelLatLng) fireLayer.addLayer(L.marker(labelLatLng,{interactive:false,icon:L.divIcon({className:'fire-label',html:escapeHtml(name),iconSize:null})}));
+      layer.bindPopup('<b>'+escapeHtml(name)+'</b>');
+    }
+  }, 'Fire Districts');
 }
 
 loadMap();
+
+// Mobile panel
+function toggleMobPanel() {
+  const panel = document.getElementById('mobile-panel');
+  panel.classList.toggle('open');
+  setTimeout(() => map.invalidateSize(), 250);
+}
+
+// Wire mobile checkboxes to layer groups
+const mobLayerMap = {
+  'm-roads': roadsLayer, 'm-cities': citiesLayer, 'm-townships': townshipsLayer,
+  'm-flood': floodLayer, 'm-schools': schoolLayer, 'm-parcels': parcelsLayer,
+  'm-salestax': salesTaxLayer, 'm-water': waterLayer, 'm-fire': fireLayer
+};
+Object.entries(mobLayerMap).forEach(([id, layer]) => {
+  document.getElementById(id).addEventListener('change', function(e) {
+    if(e.target.checked) { layer.addTo(map); if(id==='m-parcels') loadParcels(); }
+    else map.removeLayer(layer);
+    if(window.innerWidth <= 700) { toggleMobPanel(); setTimeout(() => map.invalidateSize(), 250); }
+  });
+});
+
+window.addEventListener('resize', () => map.invalidateSize());
 </script>
 </body>
 </html>
