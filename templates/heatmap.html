@@ -11,7 +11,7 @@
 html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
 #map{width:100%;height:100vh}
 .panel{background:rgba(15,22,36,0.96);border:1px solid rgba(255,255,255,0.1);border-radius:10px;box-shadow:0 3px 18px rgba(0,0,0,0.5)}
-#controls{position:absolute;top:10px;right:10px;z-index:1001;padding:14px 16px;width:300px}
+#controls{position:absolute;top:10px;right:10px;z-index:1001;padding:14px 16px;width:360px}
 #controls h2{font-size:12px;font-weight:700;color:#5a8abf;margin-bottom:12px;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:8px}
 .ctrl-section{margin-bottom:11px}
 .ctrl-section label{display:block;font-size:10px;font-weight:700;color:#5a8abf;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em}
@@ -21,7 +21,7 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
 .toggle-btn{display:inline-block;padding:5px 11px;margin:0 3px 4px 0;border:1px solid rgba(255,255,255,0.12);border-radius:4px;font-size:12px;cursor:pointer;background:rgba(255,255,255,0.04);color:#b8c8d8;transition:all .15s}
 .toggle-btn.active{background:#1a4a8a;color:#fff;border-color:#3a7aca}
 .toggle-btn:hover:not(.active){background:rgba(255,255,255,0.1)}
-#legend{position:absolute;bottom:18px;right:10px;z-index:1001;padding:14px 16px;width:300px}
+#legend{position:absolute;bottom:18px;right:10px;z-index:1001;padding:14px 16px;width:360px}
 #legend h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#5a8abf;margin-bottom:8px}
 .legend-bar{width:100%;height:13px;border-radius:3px;margin-bottom:4px}
 .legend-labels{display:flex;justify-content:space-between;font-size:10px;color:#888}
@@ -34,11 +34,11 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
 .info-icon .tip{display:none;position:absolute;right:18px;top:-4px;width:200px;background:#0d1825;border:1px solid rgba(90,138,191,0.4);border-radius:6px;padding:8px 10px;font-size:11px;color:#c0d0e0;line-height:1.45;z-index:9999;font-weight:400;white-space:normal;box-shadow:0 4px 16px rgba(0,0,0,0.6)}
 .info-icon:hover .tip{display:block}
 
-#info-bar{position:absolute;top:10px;left:10px;z-index:1001;padding:14px 18px;width:300px}
-#breakdown{position:absolute;top:50%;left:10px;transform:translateY(-50%);z-index:1001;padding:14px 16px;width:300px}
-#breakdown{position:absolute;top:50%;left:10px;transform:translateY(-50%);z-index:1001;padding:14px 16px;width:300px}
+#info-bar{position:absolute;top:10px;left:10px;z-index:1001;padding:14px 18px;width:360px}
+#breakdown{position:absolute;top:50%;left:10px;transform:translateY(-50%);z-index:1001;padding:14px 16px;width:360px}
+#breakdown{position:absolute;top:50%;left:10px;transform:translateY(-50%);z-index:1001;padding:14px 16px;width:360px}
 #info-bar h1{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px}
-#info-bar p{font-size:12px;color:#6a8aaa;line-height:1.4}
+#info-bar p{font-size:12px;color:#c8d8e8;line-height:1.4}
 .loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2000;background:rgba(15,22,36,0.97);padding:24px 36px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.6);text-align:center;color:#c8d8e8;font-size:14px;border:1px solid rgba(255,255,255,0.1)}
 .dot-anim::after{content:'';animation:dots 1.2s steps(4,end) infinite}
 @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}100%{content:'...'}}
@@ -177,8 +177,8 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
 </div>
 <div id="map"></div>
 <div id="info-bar" class="panel">
-  <h1>Clinton County Tax Heat Map 2025</h1>
-  <p>Combined RE &amp; PP tax · click any parcel for detail</p>
+  <h1>Clinton County Tax Revenue<br>Heat Map for Tax Year 2025</h1>
+  <p>Combined Real Estate &amp; Personal Property Tax · click any parcel for detail</p>
 </div>
 <div id="breakdown" class="panel">
   <div id="breakdown-content"></div>
@@ -296,7 +296,7 @@ const LEGENDS={
 
 const BREAKDOWNS={
   category:`
-    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.08)">2025 Tax Revenue by Category</div>
+    <div style="font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#ffffff;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.08)">2025 Tax Revenue by Category</div>
     <div style="font-size:13px;color:#7fcfff;font-weight:700;margin-bottom:12px;line-height:1.4">Municipal Residential is Clinton County's #1 tax revenue source</div>
     <div style="margin-bottom:8px">
       <div style="font-size:13px;margin-bottom:4px;display:flex;justify-content:space-between"><span style="color:#dc2626;font-weight:700">Municipal Residential</span><span style="color:#7fcfff;font-weight:700">$10.70M</span></div>
@@ -326,7 +326,7 @@ const BREAKDOWNS={
     <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:8px;padding-top:7px;font-size:10px;color:#7fb3d3;line-height:1.5">Includes RE + matched PP tax. $1.83M PP from non-landowners not shown above.</div>`,
 
   per_acre:`
-    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5a8abf;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.08)">Tax Revenue per Acre</div>
+    <div style="font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#ffffff;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.08)">Tax Revenue per Acre</div>
     <div style="font-size:13px;color:#7fcfff;font-weight:700;margin-bottom:14px;line-height:1.4">Small city lots generate dramatically more tax per acre than rural land</div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
       <span style="font-size:13px;color:#c0d0e0;font-weight:700">Municipal Residential</span>
