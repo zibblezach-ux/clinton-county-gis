@@ -172,7 +172,7 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
 <div class="loading" id="loading">
   <div style="font-size:26px;margin-bottom:10px">🔥</div>
   <div>Initializing map data<span class="dot-anim"></span></div>
-  <div style="font-size:11px;color:#5a8abf;margin-top:6px">12,610 parcels · 2025 RE + PP tax</div>
+  <div style="font-size:11px;color:#5a8abf;margin-top:6px">14,334 parcels · 2025 RE + PP tax</div>
   <div style="font-size:10px;color:#3a5a7a;margin-top:4px">First load may take 10-15 seconds</div>
 </div>
 <div id="map"></div>
@@ -206,6 +206,8 @@ html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden}
 
 <script>
 let TAX={};  // loaded async below
+const PARCEL_PROPS={};
+function escapeHtml(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");}
 const F={CAT:0,TC:1,TR:2,AC:3,RE:4,PP:5,TOT:6,PA:7,DEL:8,HPP:9};
 
 const CAT_COLOR={MUN:'#dc2626',SR:'#2563eb',LT:'#16a34a',C:'#ea580c',AG:'#6b7280',OT:'#374151'};
@@ -255,7 +257,34 @@ function fmt$(v){return'$'+Number(v||0).toLocaleString('en-US',{minimumFractionD
 
 function buildPopup(pn){
   const d=TAX[pn];
-  if(!d) return '<div class="px"><div class="px-title">No 2025 tax record</div><small>'+pn+'</small></div>';
+  if(!d){
+    const pp=PARCEL_PROPS[pn]||{};
+    const dh=pp.deedholder||pp.owner||'';
+    const ac=pp.deeded_acr||'';
+    const addr=pp.address||'';
+    const city=pp.city||'';
+    let reason='Tax exempt or no 2025 record on file.';
+    const dhu=dh.toUpperCase();
+    if(dhu.includes('STATE OF MISSOURI')) reason='State of Missouri — tax exempt.';
+    else if(dhu.includes('UNITED STATES')||dhu.includes('US ARMY')||dhu.includes('FEDERAL')) reason='Federal government — tax exempt.';
+    else if(dhu.includes('CITY OF')||dhu.includes('CITY PARK')||dhu.includes('CITY,')) reason='Municipal property — tax exempt.';
+    else if(dhu.includes('COUNTY')) reason='County-owned property — tax exempt.';
+    else if(dhu.includes('SCHOOL')||dhu.match(/R-\d/)) reason='School district property — tax exempt.';
+    else if(dhu.includes('CHURCH')||dhu.includes('BAPTIST')||dhu.includes('METHODIST')||dhu.includes('CATHOLIC')||dhu.includes('CHRISTIAN')||dhu.includes('ASSEMBLY OF')||dhu.includes('DIOCESE')||dhu.includes('PRESBYTERIAN')) reason='Religious organization — tax exempt.';
+    else if(dhu.includes('CEMETERY')||dhu.includes('MEMORIAL PARK')) reason='Cemetery or memorial — tax exempt.';
+    else if(dhu.includes('AMBULANCE')||dhu.includes('FIRE DIST')) reason='Special district — tax exempt.';
+    else if(dhu.includes('ROAD DISTRICT')) reason='Road district — tax exempt.';
+    else if(dhu.includes('NONPROFIT')||dhu.includes('NON-PROFIT')||dhu.includes('INC ')&&(dhu.includes('PARK')||dhu.includes('CLUB')||dhu.includes('PANTRY')||dhu.includes('CENTER')||dhu.includes('LEAGUE'))) reason='Nonprofit organization — may be tax exempt.';
+    let h='<div class="px"><div class="px-title">No 2025 Tax Record</div>';
+    h+='<div style="background:#f8f8f8;border-radius:4px;padding:6px 8px;margin-bottom:8px;font-size:11px;color:#666">'+reason+'</div>';
+    h+='<table class="px-tbl">';
+    h+='<tr><td>Parcel #</td><td>'+pn+'</td></tr>';
+    if(dh) h+='<tr><td>Owner</td><td>'+escapeHtml(dh)+'</td></tr>';
+    if(ac) h+='<tr><td>Acres</td><td>'+ac+'</td></tr>';
+    if(addr||city) h+='<tr><td>Address</td><td>'+escapeHtml((addr+' '+city).trim())+'</td></tr>';
+    h+='</table></div>';
+    return h;
+  }
   let h='<div class="px"><div class="px-title">Parcel Detail — 2025</div>';
   if(d[F.T5]) h+='<span class="px-badge" style="background:#000000;color:#ffffff">★ #'+d[F.T5]+' Top Revenue Parcel</span><br>';
   h+='<span class="px-badge px-'+d[F.CAT]+'">'+CAT_LABEL[d[F.CAT]]+'</span>';
@@ -358,7 +387,7 @@ function updateBreakdown(mode){
 
 function updateLegend(mode){
   document.getElementById('leg-title').textContent=LEGENDS[mode].title;
-  document.getElementById('leg-body').innerHTML=LEGENDS[mode].html+`<div style="margin-top:9px;padding-top:7px;border-top:1px solid rgba(255,255,255,0.1);font-size:10px;color:#4a6a8a;line-height:1.5">      <b style="color:#5a8abf">PP coverage: 71.9%</b>      <span class="info-icon">ⓘ<span class="tip" style="left:auto;right:18px">71.9% of total PP tax ($4.67M of $6.49M) was matched to a RE parcel by name + tax code. Each PP account assigned to owner\\'s primary parcel only — no double counting. Remaining $1.83M belongs to renters and non-landowners.</span></span><br>      Clinton County\\'s full 2025 tax levy of ~$26.3M is completely accounted for — $24.4M mapped to parcels, $1.83M identified as PP tax from non-landowners who rent or hold no real estate in the county.    </div>`; 
+  document.getElementById('leg-body').innerHTML=LEGENDS[mode].html+`<div style="margin-top:9px;padding-top:7px;border-top:1px solid rgba(255,255,255,0.1);font-size:10px;color:#4a6a8a;line-height:1.5">      <b style="color:#5a8abf">PP coverage: 71.9%</b>      <span class="info-icon">ⓘ<span class="tip" style="left:auto;right:18px">71.9% of total PP tax ($4.67M of $6.49M) was matched to a RE parcel by name + tax code. Each PP account assigned to owner\\'s primary parcel only — no double counting. Remaining $1.83M belongs to renters and non-landowners.</span></span><br>      Clinton County\\'s 2025 tax levy is 99.1% accounted for — $24.4M mapped to parcels, $1.83M PP tax from non-landowners. Excluded: ~$467K (2.4%) from railroad and right-of-way parcels which carry no polygon geometry in the county GIS source data.    </div>`; 
 }
 function setMode(btn){
   currentMode=btn.dataset.mode;
@@ -386,7 +415,7 @@ function toggleOverlay(k){
 }
 
 function setLoading(msg){
-  document.getElementById('loading').innerHTML='<div style="font-size:22px;margin-bottom:10px">🔥</div><div>'+msg+'</div><div style="font-size:11px;color:#5a8abf;margin-top:6px">12,610 parcels · 2025 RE + PP tax</div>';
+  document.getElementById('loading').innerHTML='<div style="font-size:22px;margin-bottom:10px">🔥</div><div>'+msg+'</div><div style="font-size:11px;color:#5a8abf;margin-top:6px">14,334 parcels · 2025 RE + PP tax</div>';
 }
 
 async function safeFetch(url){
@@ -405,11 +434,12 @@ async function loadMap(){
 
   // Step 1: parcels
   setLoading('Loading parcels…');
-  const pData = await safeFetch('/static/Parcels/parcels.geojson?v=20260614d');
+  const pData = await safeFetch('/static/Parcels/parcels.geojson?v=20260617a');
 
   setLoading('Rendering '+pData.features.length.toLocaleString()+' parcels…');
   pData.features.forEach(f=>{
     f.properties._pn=f.properties.parcel_num||f.properties.parcel_number||'';
+    if(f.properties._pn) PARCEL_PROPS[f.properties._pn]=f.properties;
   });
 
   parcelLayer=L.geoJSON(pData,{
