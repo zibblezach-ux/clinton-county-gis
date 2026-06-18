@@ -9,14 +9,7 @@
     html, body, #map { height: 100%; width: 100%; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; overflow: hidden; }
     #map { position: fixed; inset: 0; z-index: 1; }
-    .back-btn {
-      display: none;
-      position: fixed; top: 10px; right: 10px; z-index: 2000;
-      background: white; border: 1px solid #ccc; border-radius: 8px;
-      padding: 8px 14px; font-size: 13px; font-weight: 700;
-      box-shadow: 0 2px 10px rgba(0,0,0,.25);
-      text-decoration: none; color: #222;
-    }
+
     .mobile-layer-button {
       display: none; position: fixed; top: 10px; left: 10px; z-index: 2000;
       background: white; border: 1px solid #ccc; border-radius: 8px;
@@ -44,7 +37,7 @@
     .panel-close { display: none; }
     @media (max-width: 700px) {
       .mobile-layer-button { display: block; }
-      .back-btn { display: block; }
+      .back-btn { display: none; }
       .panel {
         position: fixed; top: 0; left: 0; right: 0; width: auto;
         max-height: 75vh; border-radius: 0 0 12px 12px; padding: 14px;
@@ -57,34 +50,23 @@
       label input { transform: scale(1.35); margin-right: 10px; }
       .leaflet-control-zoom { margin-top: 60px !important; }
     }
-    @media (min-width: 701px) {
-      .back-btn-desktop {
-        position: absolute; top: 12px; left: 370px; z-index: 1000;
-        background: white; border: 1px solid #ccc; border-radius: 8px;
-        padding: 8px 14px; font-size: 13px; font-weight: 700;
-        box-shadow: 0 2px 10px rgba(0,0,0,.25);
-        text-decoration: none; color: #222;
-      }
-      .back-btn-desktop:hover { background: #f0f0f0; }
-    }
+
   </style>
 </head>
 <body>
 <div id="map"></div>
 
-<button class="mobile-layer-button" id="openLayersBtn">Layers</button>
-<a class="back-btn" href="/">← Back</a>
-<a class="back-btn-desktop" href="/">← Back to GIS Portal</a>
 
+
+<button class="mobile-layer-button" id="openLayersBtn">Layers</button>
 <div class="panel" id="layerPanel">
   <button class="panel-close" id="closeLayersBtn">Close</button>
-  <a class="back-link" href="/">← Back to GIS Portal</a>
   <h2>Clinton County Voter GIS</h2>
   <div class="small">Voter names excluded. Voter points use Census-geocoded residential addresses. Voter layers load only when selected.</div>
   <h3>Base Layers</h3>
   <label><input type="checkbox" id="roadsToggle" checked> Roads</label>
   <label><input type="checkbox" id="voteDistrictToggle" checked> Vote District</label>
-  <label><input type="checkbox" id="parcelsToggle"> Parcels</label>
+
   <h3>Election Participation</h3>
   <label><input type="checkbox" class="voterLayer" data-layer="primary_2024"> <span class="legend-dot" style="background:#b91c1c"></span>Aug. 2024 Primary Voters</label>
   <label><input type="checkbox" class="voterLayer" data-layer="general_2024"> <span class="legend-dot" style="background:#1d4ed8"></span>Nov. 2024 General Voters</label>
@@ -106,7 +88,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const map = L.map("map", { zoomControl: true, tap: true })
-  .setView([39.60, -94.40], window.innerWidth <= 700 ? 9 : 10);
+  .setView([39.60, -94.40], window.innerWidth <= 700 ? 9 : 11);
 
 L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
   maxZoom: 19,
@@ -149,7 +131,7 @@ const layerInfo = {
 };
 
 const loadedVoterLayers = {};
-let roadsLayer, voteDistrictLayer, parcelsLayer;
+let roadsLayer, voteDistrictLayer;
 
 function makeVoterLayer(data, color) {
   return L.geoJSON(data, {
@@ -236,11 +218,11 @@ function loadBase(url, style, callback) {
     .catch(err => console.warn("Could not load", url, err));
 }
 
-loadBase("/static/roads.geojson", {
+loadBase("/static/Roads/roads.geojson", {
   style: { color: "#555", weight: window.innerWidth <= 700 ? 1.6 : 1.2 }
 }, layer => roadsLayer = layer.addTo(map));
 
-fetch("/static/votedistrict.geojson")
+fetch("/static/VoteDistricts/votedistrict.geojson")
   .then(r => r.ok ? r.json() : null)
   .then(data => {
     if (!data) return;
@@ -256,11 +238,9 @@ fetch("/static/votedistrict.geojson")
       }
     }).addTo(map);
   })
-  .catch(err => console.warn("Could not load /static/votedistrict.geojson", err));
+  .catch(err => console.warn("Could not load /static/VoteDistricts/votedistrict.geojson", err));
 
-loadBase("/static/parcels.geojson", {
-  style: { color: "#999", weight: 0.5, fillOpacity: 0 }
-}, layer => parcelsLayer = layer);
+
 
 document.getElementById("roadsToggle").addEventListener("change", e => {
   if (!roadsLayer) return;
@@ -270,11 +250,7 @@ document.getElementById("voteDistrictToggle").addEventListener("change", e => {
   if (!voteDistrictLayer) return;
   e.target.checked ? voteDistrictLayer.addTo(map) : map.removeLayer(voteDistrictLayer);
 });
-document.getElementById("parcelsToggle").addEventListener("change", e => {
-  if (!parcelsLayer) return;
-  e.target.checked ? parcelsLayer.addTo(map) : map.removeLayer(parcelsLayer);
-  if (window.innerWidth <= 700 && e.target.checked) { panel.classList.remove("open"); setTimeout(() => map.invalidateSize(), 250); }
-});
+
 
 window.addEventListener("resize", () => map.invalidateSize());
 </script>

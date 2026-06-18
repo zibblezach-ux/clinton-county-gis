@@ -12,27 +12,24 @@
   <style>
     html, body { margin: 0; padding: 0; height: 100%; width: 100%; font-family: Arial, sans-serif; overflow: hidden; }
     #map { width: 100%; height: 100vh; }
-    .leaflet-control-layers { font-size: 14px; max-height: 350px; overflow-y: auto; }
 
-    .back-btn {
-      position: absolute; top: 10px; left: 10px; z-index: 1001;
-      background: rgba(255,255,255,0.95); color: #222;
-      border: 1px solid #ccc; border-radius: 6px; padding: 8px 14px;
-      font-size: 13px; cursor: pointer; text-decoration: none; display: inline-block;
-      box-shadow: 0 0 6px rgba(0,0,0,0.2);
-    }
-    .back-btn:hover { background: #f0f0f0; }
+    .leaflet-control-layers { font-size: 14px; max-height: 350px; overflow-y: auto; width: 280px; box-sizing: border-box; }
+    /* Zoom at very top */
+    .leaflet-top.leaflet-left .leaflet-control-zoom { margin-top: 10px; }
+    /* Layer control pushed down: 10px top + ~58px zoom + 8px gap + ~80px title box + 8px gap = ~164px */
+    .leaflet-top.leaflet-left .leaflet-control-layers { margin-top: 164px; }
 
+    /* Title box sits between zoom and layer control */
     .info-panel {
-      position: absolute; top: 50px; left: 10px; z-index: 1000;
-      background: rgba(255,255,255,0.95); padding: 10px 14px;
+      position: absolute; top: 78px; left: 10px; z-index: 1000;
+      background: rgba(255,255,255,0.95); padding: 12px 17px;
       border-radius: 6px; box-shadow: 0 0 8px rgba(0,0,0,0.3);
-      font-size: 14px; max-width: 320px;
+      font-size: 17px; width: 280px; box-sizing: border-box;
     }
-    .info-title { font-weight: bold; font-size: 16px; margin-bottom: 6px; }
+    .info-title { font-weight: bold; font-size: 19px; margin-bottom: 6px; }
 
     .city-label { background: transparent; border: none; box-shadow: none; color: #4b0082; font-size: 12px; font-weight: bold; }
-    .township-label { background: transparent; border: none; box-shadow: none; color: #0033aa; font-size: 11px; font-weight: bold; white-space: nowrap; }
+    .township-label { background: transparent; border: none; box-shadow: none; color: #f97316; font-size: 11px; font-weight: bold; white-space: nowrap; }
     .school-label { background: transparent; border: none; box-shadow: none; color: #006600; font-size: 14px; font-weight: bold; white-space: nowrap; text-align: center; }
     .water-label { background: transparent; border: none; box-shadow: none; color: #005f87; font-size: 14px; font-weight: bold; white-space: nowrap; text-align: center; width: auto !important; height: auto !important; line-height: 1.2; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; }
     .fire-label { background: transparent; border: none; box-shadow: none; color: #cc0000; font-size: 13px; font-weight: bold; white-space: nowrap; text-align: center; width: auto !important; height: auto !important; line-height: 1.2; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; }
@@ -51,7 +48,6 @@
       .info-panel { display: none; }
       .leaflet-control-layers { display: none !important; }
       .leaflet-control-geocoder { display: none !important; }
-      .back-btn { top: 10px; left: 10px; font-size: 13px; padding: 8px 12px; }
 
       #mobile-panel {
         display: block;
@@ -96,8 +92,6 @@
 </head>
 <body>
 
-<a class="back-btn" href="/">← Back</a>
-
 <!-- Desktop info panel -->
 <div class="info-panel">
   <div class="info-title">Community Districts GIS</div>
@@ -115,8 +109,8 @@
   <h3>Community Districts GIS</h3>
   <p>Toggle layers</p>
   <div class="mob-layer"><input type="checkbox" id="m-roads" checked><label for="m-roads">Roads</label></div>
-  <div class="mob-layer"><input type="checkbox" id="m-cities"><label for="m-cities">Cities</label></div>
-  <div class="mob-layer"><input type="checkbox" id="m-townships"><label for="m-townships">Townships</label></div>
+  <div class="mob-layer"><input type="checkbox" id="m-cities" checked><label for="m-cities">Cities</label></div>
+  <div class="mob-layer"><input type="checkbox" id="m-townships" checked><label for="m-townships">Townships</label></div>
   <div class="mob-layer"><input type="checkbox" id="m-flood"><label for="m-flood">Flood Zones</label></div>
   <div class="mob-layer"><input type="checkbox" id="m-schools"><label for="m-schools">School Districts</label></div>
   <div class="mob-layer"><input type="checkbox" id="m-parcels"><label for="m-parcels">Parcels</label></div>
@@ -139,8 +133,8 @@ L.control.scale().addTo(map);
 L.Control.geocoder({ defaultMarkGeocode: true }).addTo(map);
 
 const roadsLayer      = L.layerGroup().addTo(map);
-const citiesLayer     = L.layerGroup();
-const townshipsLayer  = L.layerGroup();
+const citiesLayer     = L.layerGroup().addTo(map);
+const townshipsLayer  = L.layerGroup().addTo(map);
 const floodLayer      = L.layerGroup();
 const schoolLayer     = L.layerGroup();
 const parcelsLayer    = L.layerGroup();
@@ -157,7 +151,7 @@ const overlays = {
   "Parcels": parcelsLayer, "Sales Tax": salesTaxLayer,
   "Water Districts": waterLayer, "Fire Districts": fireLayer
 };
-L.control.layers({ 'ESRI Street': esri, 'OpenStreetMap': osm, 'ESRI Satellite': satellite }, overlays, { collapsed: false }).addTo(map);
+L.control.layers({ 'ESRI Street': esri, 'OpenStreetMap': osm, 'ESRI Satellite': satellite }, overlays, { collapsed: false, position: 'topleft' }).addTo(map);
 
 async function loadLayer(url, target, options, label) {
   try {
@@ -222,13 +216,13 @@ async function loadMap() {
   await loadLayer('/static/Roads/roads.geojson', roadsLayer, { renderer:L.canvas(), style:{color:'#666666',weight:0.7,opacity:0.35,dashArray:'3,3'} }, 'Roads');
 
   await loadLayer('/static/Cities/cities.geojson', citiesLayer, {
-    pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:5,fillColor:'#7a00cc',color:'#000',weight:1,fillOpacity:0.85}),
+    style:{color:'#ff0000',weight:2,opacity:1,fillOpacity:0},
     onEachFeature:(f,layer)=>{ if(f.properties?.NAME) layer.bindTooltip(f.properties.NAME,{permanent:true,className:'city-label'}); }
   }, 'Cities');
 
   await loadLayer('/static/Townships/townships.geojson', townshipsLayer, {
     renderer:L.canvas(),
-    style:{color:'#0044ff',weight:3,opacity:1,fillOpacity:0},
+    style:{color:'#f97316',weight:2,opacity:1,fillOpacity:0},
     onEachFeature:function(feature,layer){ const name=feature.properties?.NAME||feature.properties?.NAMELSAD||'Township'; layer.bindTooltip(name,{permanent:true,direction:'center',className:'township-label'}); }
   }, 'Townships');
 
