@@ -245,11 +245,57 @@
 <div id="mobile-panel">
   <button class="mob-close" onclick="toggleMobPanel()">Close</button>
   <h3>Road &amp; Bridge GIS</h3>
-  <div style="font-size:11px;color:#6b7a99;margin-bottom:10px" id="mob-status">Loading...</div>
-  <div class="mob-layer"><input type="checkbox" id="m-quality" checked><div class="mob-swatch" style="background:linear-gradient(to right,#22c55e,#eab308,#ef4444)"></div><label for="m-quality">County Roads — LiDAR + Aerial</label></div>
-  <div class="mob-layer"><input type="checkbox" id="m-county"><div class="mob-swatch" style="background:#222222"></div><label for="m-county">County Roads (plain)</label></div>
-  <div class="mob-layer"><input type="checkbox" id="m-municipal" checked><div class="mob-swatch" style="background:#cc44cc"></div><label for="m-municipal">Municipal streets</label></div>
-  <div class="mob-layer"><input type="checkbox" id="m-modot" checked><div class="mob-swatch" style="background:#4a90d9"></div><label for="m-modot">MoDOT highways</label></div>
+
+  <!-- Tab buttons -->
+  <div style="display:flex;gap:6px;margin-bottom:14px">
+    <button id="mob-tab-layers" onclick="mobTab('layers')"
+      style="flex:1;padding:7px;border-radius:5px;border:none;background:#2e75b6;color:#fff;font-size:13px;font-weight:bold;cursor:pointer">
+      Layers
+    </button>
+    <button id="mob-tab-about" onclick="mobTab('about')"
+      style="flex:1;padding:7px;border-radius:5px;border:none;background:#2d3650;color:#aab;font-size:13px;cursor:pointer">
+      About
+    </button>
+  </div>
+
+  <!-- Layers tab -->
+  <div id="mob-pane-layers">
+    <div style="font-size:11px;color:#6b7a99;margin-bottom:10px" id="mob-status">Loading...</div>
+    <div class="mob-layer"><input type="checkbox" id="m-quality" checked><div class="mob-swatch" style="background:linear-gradient(to right,#22c55e,#eab308,#ef4444)"></div><label for="m-quality">County Roads — LiDAR + Aerial</label></div>
+    <div class="mob-layer"><input type="checkbox" id="m-county"><div class="mob-swatch" style="background:#222222"></div><label for="m-county">County Roads (plain)</label></div>
+    <div class="mob-layer"><input type="checkbox" id="m-municipal"><div class="mob-swatch" style="background:#cc44cc"></div><label for="m-municipal">Municipal streets</label></div>
+    <div class="mob-layer" style="border-bottom:none"><input type="checkbox" id="m-modot"><div class="mob-swatch" style="background:#4a90d9"></div><label for="m-modot">MoDOT highways</label></div>
+  </div>
+
+  <!-- About tab -->
+  <div id="mob-pane-about" style="display:none;font-size:13px;color:#c8c4bb;line-height:1.6">
+    <div style="font-weight:bold;color:#fff;font-size:14px;margin-bottom:4px">Road Quality Assessment</div>
+    <div style="font-size:11px;color:#6b7a99;margin-bottom:12px">Clinton County, Missouri &bull; LiDAR + Aerial Analysis</div>
+
+    <div style="font-size:11px;font-weight:bold;color:#60a5fa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;border-bottom:1px solid #2d3650;padding-bottom:3px">What This Tool Does</div>
+    <div style="margin-bottom:12px">Every county road has been scored using LiDAR elevation data and AI-analyzed aerial imagery — without a single road crew leaving the office. Tap any road for its full assessment.</div>
+
+    <div style="font-size:11px;font-weight:bold;color:#60a5fa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;border-bottom:1px solid #2d3650;padding-bottom:3px">PASER Rating Scale</div>
+    <div style="margin-bottom:4px">
+      <div style="display:flex;align-items:center;gap:8px;margin:5px 0"><div style="width:11px;height:11px;border-radius:50%;background:#22c55e;flex-shrink:0"></div><div><strong>5 — Excellent:</strong> No maintenance needed.</div></div>
+      <div style="display:flex;align-items:center;gap:8px;margin:5px 0"><div style="width:11px;height:11px;border-radius:50%;background:#86efac;flex-shrink:0"></div><div><strong>4 — Good:</strong> Routine grading sufficient.</div></div>
+      <div style="display:flex;align-items:center;gap:8px;margin:5px 0"><div style="width:11px;height:11px;border-radius:50%;background:#eab308;flex-shrink:0"></div><div><strong>3 — Fair:</strong> Maintenance needed within 1-2 years.</div></div>
+      <div style="display:flex;align-items:center;gap:8px;margin:5px 0"><div style="width:11px;height:11px;border-radius:50%;background:#f97316;flex-shrink:0"></div><div><strong>2 — Poor:</strong> Priority maintenance needed.</div></div>
+      <div style="display:flex;align-items:center;gap:8px;margin:5px 0"><div style="width:11px;height:11px;border-radius:50%;background:#ef4444;flex-shrink:0"></div><div><strong>1 — Failed:</strong> Immediate action required.</div></div>
+    </div>
+
+    <div style="font-size:11px;font-weight:bold;color:#60a5fa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;border-bottom:1px solid #2d3650;padding-bottom:3px;margin-top:12px">County Summary</div>
+    <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #1f2937;font-size:12px"><span style="color:#9ca3af">Total miles assessed</span><span style="font-weight:bold">1,409 mi</span></div>
+    <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #1f2937;font-size:12px"><span style="color:#9ca3af">Segments scored</span><span style="font-weight:bold">3,420</span></div>
+    <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #1f2937;font-size:12px"><span style="color:#9ca3af">LiDAR vintage</span><span style="font-weight:bold">2020/2021</span></div>
+    <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #1f2937;font-size:12px"><span style="color:#9ca3af">Imagery vintage</span><span style="font-weight:bold">2023</span></div>
+    <div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px"><span style="color:#9ca3af">Conflicts detected</span><span style="font-weight:bold">262</span></div>
+
+    <div style="font-size:11px;font-weight:bold;color:#60a5fa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;border-bottom:1px solid #2d3650;padding-bottom:3px;margin-top:12px">Data Sources</div>
+    <div style="margin-bottom:6px"><strong style="color:#60a5fa">LiDAR (2020/2021)</strong> — MSDIS 1-meter elevation data measuring crown, cross slope, and drainage geometry.</div>
+    <div style="margin-bottom:12px"><strong style="color:#60a5fa">Aerial Imagery (2023)</strong> — Missouri 6-inch aerial photography analyzed by AI for gravel loss, rutting, washboarding, and vegetation encroachment.</div>
+    <div style="font-size:10px;color:#6b7a99">Data is for prioritization purposes only and does not replace engineering judgment. Last updated June 2026.</div>
+  </div>
 </div>
 
 <script>
@@ -514,6 +560,15 @@ loadMap();
 function toggleMobPanel() {
   document.getElementById('mobile-panel').classList.toggle('open');
   setTimeout(()=>map.invalidateSize(), 250);
+}
+
+function mobTab(tab) {
+  document.getElementById('mob-pane-layers').style.display = tab === 'layers' ? '' : 'none';
+  document.getElementById('mob-pane-about').style.display  = tab === 'about'  ? '' : 'none';
+  document.getElementById('mob-tab-layers').style.background = tab === 'layers' ? '#2e75b6' : '#2d3650';
+  document.getElementById('mob-tab-layers').style.color      = tab === 'layers' ? '#fff' : '#aab';
+  document.getElementById('mob-tab-about').style.background  = tab === 'about'  ? '#2e75b6' : '#2d3650';
+  document.getElementById('mob-tab-about').style.color       = tab === 'about'  ? '#fff' : '#aab';
 }
 
 document.getElementById('m-quality').addEventListener('change', function(e) {
