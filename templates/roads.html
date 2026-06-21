@@ -7,241 +7,544 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <style>
-    html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: Arial, sans-serif; }
-    #map { width: 100%; height: 100vh; }
-    .leaflet-control-layers { font-size: 13px; max-height: 350px; overflow-y: auto; width: 280px; box-sizing: border-box; }
-    /* Zoom at very top */
-    .leaflet-top.leaflet-left .leaflet-control-zoom { margin-top: 10px; }
-    /* Layer control pushed down: 10px top + ~58px zoom + 8px gap + ~75px title box + 8px gap = ~159px */
-    .leaflet-top.leaflet-left .leaflet-control-layers { margin-top: 159px; }
+    html, body { margin:0; padding:0; height:100%; width:100%; overflow:hidden; font-family:Arial,sans-serif; }
+    #map { width:100%; height:100vh; }
 
-    /* Title box sits between zoom and layer control */
-    .info-panel {
-      position: absolute; top: 78px; left: 10px; z-index: 1000;
-      background: rgba(17,24,39,0.92); color: #e8e4d9;
-      padding: 10px 14px; border-radius: 6px; font-size: 13px; width: 280px; box-sizing: border-box;
+    /* About panel — right side, shown only when LiDAR+Aerial is active */
+    #about-panel {
+      position:absolute; top:0; right:0; width:300px; height:100vh;
+      background:rgba(17,24,39,0.97); color:#e8e4d9;
+      overflow-y:auto; z-index:2000; box-sizing:border-box;
+      padding:14px 14px 24px; border-left:1px solid #2d3650;
+      display:none;
     }
-    .info-title { font-weight: bold; font-size: 15px; margin-bottom: 4px; }
-    #status { font-size: 11px; color: #6b7a99; margin-top: 6px; }
+    .ap-title { font-size:16px; font-weight:bold; color:#fff; margin-bottom:3px; }
+    .ap-sub   { font-size:11px; color:#6b7a99; margin-bottom:12px; }
+    .ap-section { margin-bottom:12px; }
+    .ap-section-title { font-size:11px; font-weight:bold; color:#60a5fa; text-transform:uppercase; letter-spacing:.05em; margin-bottom:5px; border-bottom:1px solid #2d3650; padding-bottom:3px; }
+    .ap-text  { font-size:11px; color:#c8c4bb; line-height:1.6; margin-bottom:5px; }
+    .paser-row { display:flex; align-items:flex-start; gap:7px; margin:4px 0; }
+    .paser-dot { width:11px; height:11px; border-radius:50%; flex-shrink:0; margin-top:2px; }
+    .paser-label { font-size:11px; color:#e8e4d9; font-weight:bold; min-width:58px; }
+    .paser-desc  { font-size:10px; color:#9ca3af; line-height:1.4; }
+    .stat-row { display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid #1f2937; font-size:11px; }
+    .stat-label { color:#9ca3af; }
+    .stat-value { color:#e8e4d9; font-weight:bold; }
 
-    .leaflet-popup-content-wrapper {
-      background: rgba(17,24,39,0.95); color: #e8e4d9;
-      border-radius: 6px; border: 1px solid #2d3650;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    /* Title panel — top left, simple */
+    .title-panel {
+      position:absolute; top:10px; left:10px; z-index:1001;
+      background:rgba(17,24,39,0.94); color:#e8e4d9;
+      padding:12px 18px; border-radius:6px; font-size:15px; width:350px; box-sizing:border-box;
     }
-    .leaflet-popup-tip { background: rgba(17,24,39,0.95); }
-    .leaflet-popup-content { margin: 10px 14px; font-size: 13px; line-height: 1.6; }
-    .popup-title { font-weight: bold; font-size: 14px; color: #ffffff; margin-bottom: 6px; border-bottom: 1px solid #2d3650; padding-bottom: 4px; }
-    .popup-row { display: flex; justify-content: space-between; gap: 12px; }
-    .popup-label { color: #6b7a99; }
-    .popup-value { color: #e8e4d9; text-align: right; }
-    .leaflet-popup-close-button { color: #6b7a99 !important; }
+    .title-main { font-weight:bold; font-size:22px; margin-bottom:3px; }
+    .title-sub  { font-size:13px; color:#a0b4cc; }
+    #status { font-size:12px; color:#6b7a99; margin-top:5px; }
 
-    /* ── Mobile ── */
-    @media (max-width: 700px) {
-      .info-panel { display: none; }
-      .leaflet-control-layers { display: none !important; }
-      .legend-panel { display: none; }
+    /* Quality summary — bottom left, separate box */
+    #quality-summary-panel {
+      position:absolute; bottom:30px; left:10px; z-index:1000;
+      background:rgba(17,24,39,0.94); color:#e8e4d9;
+      padding:14px 18px; border-radius:6px; font-size:14px; width:350px; box-sizing:border-box;
+      display:none;
+    }
+    .qs-title { font-size:13px; color:#8899bb; margin-bottom:8px; font-weight:bold; text-transform:uppercase; letter-spacing:.04em; }
+    .quality-bar { display:flex; gap:4px; margin-bottom:4px; }
+    .q-block { flex:1; border-radius:3px; padding:8px 4px; text-align:center; font-size:14px; font-weight:bold; }
+    .q-green  { background:#1a7a2e; color:#fff; }
+    .q-yellow { background:#b38600; color:#fff; }
+    .q-red    { background:#a01010; color:#fff; }
+    .q-label  { font-size:12px; color:#8899bb; margin-top:3px; }
+    .q-source { font-size:11px; color:#556; margin-top:6px; font-style:italic; }
 
+    /* Layer control */
+    .leaflet-control-layers { font-size:14px; max-height:60vh; overflow-y:auto; width:350px; box-sizing:border-box; }
+    .leaflet-top.leaflet-left .leaflet-control-zoom { margin-top:10px; }
+    .leaflet-top.leaflet-left .leaflet-control-layers { margin-top:10px; }
+
+    /* Legend — bottom right */
+    .legend-panel {
+      position:absolute; bottom:30px; right:10px; z-index:1000;
+      background:rgba(17,24,39,0.92); color:#e8e4d9;
+      padding:10px 14px; border-radius:6px; font-size:12px; min-width:190px;
+    }
+    .legend-title { font-weight:bold; margin-bottom:6px; font-size:13px; }
+    .legend-row { display:flex; align-items:center; gap:8px; margin:4px 0; }
+    .legend-line { width:28px; height:4px; border-radius:2px; flex-shrink:0; }
+
+    /* Popups */
+    .leaflet-popup-content-wrapper { background:rgba(17,24,39,0.97); color:#e8e4d9; border-radius:6px; border:1px solid #2d3650; box-shadow:0 2px 8px rgba(0,0,0,.5); }
+    .leaflet-popup-tip { background:rgba(17,24,39,0.97); }
+    .leaflet-popup-content { margin:10px 14px; font-size:13px; line-height:1.6; min-width:220px; }
+    .popup-title { font-weight:bold; font-size:14px; color:#fff; margin-bottom:6px; border-bottom:1px solid #2d3650; padding-bottom:4px; }
+    .popup-row { display:flex; justify-content:space-between; gap:12px; }
+    .popup-label { color:#6b7a99; }
+    .popup-value { color:#e8e4d9; text-align:right; }
+    .popup-badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:bold; margin-top:4px; }
+    .badge-green    { background:#1a7a2e; color:#fff; }
+    .badge-yellow   { background:#b38600; color:#fff; }
+    .badge-red      { background:#a01010; color:#fff; }
+    .badge-unscored { background:#555; color:#ccc; }
+    .leaflet-popup-close-button { color:#6b7a99 !important; }
+
+    /* Mobile */
+    @media (max-width:700px) {
+      .title-panel { display:none; }
+      .leaflet-control-layers { display:none !important; }
+      .legend-panel { display:none; }
+      #quality-summary-panel { display:none !important; }
+      #about-panel { display:none !important; }
       #mobile-panel {
-        display: block;
-        position: fixed; bottom: 0; left: 0; right: 0; z-index: 3000;
-        background: rgba(17,24,39,0.97); color: #e8e4d9;
-        border-radius: 14px 14px 0 0;
-        padding: 14px 16px 24px;
-        transform: translateY(110%);
-        transition: transform 0.22s ease;
-        max-height: 70vh; overflow-y: auto;
+        display:block; position:fixed; bottom:0; left:0; right:0; z-index:3000;
+        background:rgba(17,24,39,0.97); color:#e8e4d9;
+        border-radius:14px 14px 0 0; padding:14px 16px 24px;
+        transform:translateY(110%); transition:transform 0.22s ease; max-height:70vh; overflow-y:auto;
       }
-      #mobile-panel.open { transform: translateY(0); }
-      #mobile-panel h3 { margin: 0 0 12px; font-size: 15px; color: #fff; }
-      .mob-close {
-        float: right; background: #2d3650; color: #e8e4d9;
-        border: none; border-radius: 6px; padding: 5px 10px;
-        font-size: 13px; font-weight: bold; cursor: pointer;
-      }
-      .mob-status { font-size: 11px; color: #6b7a99; margin-bottom: 12px; }
-      .mob-layer { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #2d3650; font-size: 14px; }
-      .mob-layer:last-child { border-bottom: none; }
-      .mob-layer input[type=checkbox] { width: 18px; height: 18px; cursor: pointer; }
-      .mob-swatch { width: 22px; height: 5px; border-radius: 3px; flex-shrink: 0; }
-
+      #mobile-panel.open { transform:translateY(0); }
+      #mobile-panel h3 { margin:0 0 10px; font-size:15px; color:#fff; }
+      .mob-close { float:right; background:#2d3650; color:#e8e4d9; border:none; border-radius:6px; padding:5px 10px; font-size:13px; cursor:pointer; }
+      .mob-layer { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #2d3650; font-size:14px; }
+      .mob-layer:last-child { border-bottom:none; }
+      .mob-layer input[type=checkbox] { width:18px; height:18px; cursor:pointer; }
+      .mob-swatch { width:22px; height:5px; border-radius:3px; flex-shrink:0; }
       #mob-fab {
-        display: flex;
-        position: fixed; bottom: 20px; right: 16px; z-index: 2000;
-        width: 50px; height: 50px; border-radius: 50%;
-        background: rgba(17,24,39,0.95); color: #e8e4d9;
-        border: 1px solid #2d3650; font-size: 22px;
-        align-items: center; justify-content: center;
-        cursor: pointer; box-shadow: 0 3px 12px rgba(0,0,0,0.5);
+        display:flex; position:fixed; bottom:20px; right:16px; z-index:2000;
+        width:50px; height:50px; border-radius:50%;
+        background:rgba(17,24,39,0.95); color:#e8e4d9; border:1px solid #2d3650;
+        font-size:22px; align-items:center; justify-content:center;
+        cursor:pointer; box-shadow:0 3px 12px rgba(0,0,0,.5);
       }
-      .leaflet-control-zoom { margin-top: 60px !important; }
+      .leaflet-control-zoom { margin-top:60px !important; }
     }
-
-    @media (min-width: 701px) {
-      #mobile-panel { display: none; }
-      #mob-fab { display: none; }
-    }
+    @media (min-width:701px) { #mobile-panel { display:none; } #mob-fab { display:none; } }
   </style>
 </head>
 <body>
 
-<!-- Desktop info panel -->
-<div class="info-panel">
-  <div class="info-title">Road &amp; Bridge GIS</div>
-  Use the layer control (below) to toggle layers
-  <div id="status">Loading...</div>
+<!-- About panel (right side) -->
+<div id="about-panel">
+  <div class="ap-title">Road Quality Assessment</div>
+  <div class="ap-sub">Clinton County, Missouri &bull; LiDAR + Aerial Analysis</div>
+
+  <div class="ap-section">
+    <div class="ap-section-title">What This Tool Does</div>
+    <div class="ap-text">This map provides the first comprehensive, data-driven road quality assessment ever produced for Clinton County. Every county road has been scored using two independent sources of remote sensing data — without a single road crew leaving the office.</div>
+  </div>
+
+  <div class="ap-section">
+    <div class="ap-section-title">How to Use This Map</div>
+    <div class="ap-text" style="color:#e8e4d9">&#8226; <strong>Click any road</strong> to see its PASER rating, LiDAR score, AI surface assessment, and specific distress types identified.</div>
+    <div class="ap-text" style="color:#e8e4d9">&#8226; <strong>Orange and red roads</strong> (PASER 1-2) are candidates for priority maintenance or reconstruction.</div>
+    <div class="ap-text" style="color:#e8e4d9">&#8226; <strong>Conflict flag &#9888;</strong> in a popup means LiDAR and imagery disagree — worth a physical inspection.</div>
+    <div class="ap-text" style="color:#e8e4d9">&#8226; Use <strong>ESRI Satellite</strong> base layer to visually verify road conditions.</div>
+    <div class="ap-text" style="color:#6b7a99;font-size:10px;margin-top:8px">Data is for prioritization purposes only and does not replace engineering judgment. Last updated June 2026.</div>
+  </div>
+
+  <div class="ap-section">
+    <div class="ap-section-title">PASER Rating Scale</div>
+    <div class="ap-text">The Pavement Surface Evaluation and Rating (PASER) system is the national standard for gravel road condition assessment, developed by the University of Wisconsin.</div>
+    <div class="paser-row"><div class="paser-dot" style="background:#22c55e"></div><div><span class="paser-label">5 &mdash; Excellent</span><div class="paser-desc">New or recently maintained. Good crown, clean drainage, full gravel cover. No maintenance needed.</div></div></div>
+    <div class="paser-row"><div class="paser-dot" style="background:#86efac"></div><div><span class="paser-label">4 &mdash; Good</span><div class="paser-desc">Minor surface wear. Adequate crown and drainage. Routine grading sufficient.</div></div></div>
+    <div class="paser-row"><div class="paser-dot" style="background:#eab308"></div><div><span class="paser-label">3 &mdash; Fair</span><div class="paser-desc">Traffic effects visible. Some washboarding or minor rutting. Needs routine maintenance within 1-2 years.</div></div></div>
+    <div class="paser-row"><div class="paser-dot" style="background:#f97316"></div><div><span class="paser-label">2 &mdash; Poor</span><div class="paser-desc">Significant deformation. Poor drainage. Major gravel loss or erosion. Needs priority attention.</div></div></div>
+    <div class="paser-row"><div class="paser-dot" style="background:#ef4444"></div><div><span class="paser-label">1 &mdash; Failed</span><div class="paser-desc">Road barely passable. Severe erosion or structural failure. Immediate action required.</div></div></div>
+  </div>
+
+  <div class="ap-section">
+    <div class="ap-section-title">County Summary</div>
+    <div class="stat-row"><span class="stat-label">Total roads assessed</span><span class="stat-value">1,409 miles</span></div>
+    <div class="stat-row"><span class="stat-label">Road segments scored</span><span class="stat-value">3,420</span></div>
+    <div class="stat-row"><span class="stat-label">LiDAR data vintage</span><span class="stat-value">2020 / 2021</span></div>
+    <div class="stat-row"><span class="stat-label">Imagery data vintage</span><span class="stat-value">2023</span></div>
+    <div class="stat-row"><span class="stat-label">Conflicts detected</span><span class="stat-value">262 segments</span></div>
+  </div>
+
+  <div class="ap-section">
+    <div class="ap-section-title">Data Sources</div>
+    <div class="ap-text"><strong style="color:#60a5fa">LiDAR Elevation (2020/2021)</strong> — Aircraft laser scan data from MSDIS at 1-meter resolution. Measures crown height, cross slope, and drainage geometry.</div>
+    <div class="ap-text"><strong style="color:#60a5fa">Aerial Imagery (2023)</strong> — Missouri statewide 6-inch aerial photography analyzed by AI. Identifies gravel loss, rutting, washboarding, vegetation encroachment, and crown loss.</div>
+    <div class="ap-text">Both sources are combined into a single PASER rating. Where they agree, confidence is high. Where they disagree, the road is flagged for inspection.</div>
+  </div>
 </div>
 
+<!-- Title panel -->
+<div class="title-panel">
+  <div class="title-main">Road &amp; Bridge GIS</div>
+  <div class="title-sub">Clinton County, Missouri</div>
+</div>
+
+<!-- Quality summary panel (bottom left, separate) -->
+<div id="quality-summary-panel">
+  <div class="qs-title">County Road Quality Summary</div>
+  <div class="quality-bar">
+    <div class="q-block q-green"  id="q-green-block">—</div>
+    <div class="q-block q-yellow" id="q-yellow-block">—</div>
+    <div class="q-block q-red"    id="q-red-block">—</div>
+  </div>
+  <div style="display:flex;gap:4px;margin-bottom:2px;">
+    <div style="flex:1;text-align:center" class="q-label">Good (mi)</div>
+    <div style="flex:1;text-align:center" class="q-label">Fair (mi)</div>
+    <div style="flex:1;text-align:center" class="q-label">Poor (mi)</div>
+  </div>
+  <div id="q-source" class="q-source"></div>
+  <div style="border-top:1px solid #2d3650;margin:10px 0 8px;"></div>
+  <div class="qs-title" style="margin-bottom:6px">PASER Breakdown</div>
+  <div id="paser-breakdown">
+    <div style="display:flex;align-items:center;gap:8px;margin:4px 0">
+      <div style="width:12px;height:12px;border-radius:50%;background:#22c55e;flex-shrink:0"></div>
+      <div style="flex:1;font-size:12px;color:#c8c4bb">5 — Excellent</div>
+      <div id="pb-5" style="font-size:13px;font-weight:bold;color:#e8e4d9">—</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin:4px 0">
+      <div style="width:12px;height:12px;border-radius:50%;background:#86efac;flex-shrink:0"></div>
+      <div style="flex:1;font-size:12px;color:#c8c4bb">4 — Good</div>
+      <div id="pb-4" style="font-size:13px;font-weight:bold;color:#e8e4d9">—</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin:4px 0">
+      <div style="width:12px;height:12px;border-radius:50%;background:#eab308;flex-shrink:0"></div>
+      <div style="flex:1;font-size:12px;color:#c8c4bb">3 — Fair</div>
+      <div id="pb-3" style="font-size:13px;font-weight:bold;color:#e8e4d9">—</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin:4px 0">
+      <div style="width:12px;height:12px;border-radius:50%;background:#f97316;flex-shrink:0"></div>
+      <div style="flex:1;font-size:12px;color:#c8c4bb">2 — Poor</div>
+      <div id="pb-2" style="font-size:13px;font-weight:bold;color:#e8e4d9">—</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin:4px 0">
+      <div style="width:12px;height:12px;border-radius:50%;background:#ef4444;flex-shrink:0"></div>
+      <div style="flex:1;font-size:12px;color:#c8c4bb">1 — Failed</div>
+      <div id="pb-1" style="font-size:13px;font-weight:bold;color:#e8e4d9">—</div>
+    </div>
+  </div>
+</div>
 
 <div id="map"></div>
 
-<!-- Mobile FAB -->
-<button id="mob-fab" onclick="toggleMobPanel()" title="Layers">☰</button>
+<!-- Legend (bottom right) -->
+<div class="legend-panel">
+  <div class="legend-title">Legend</div>
+  <div id="quality-legend" style="display:none">
+    <div style="font-size:10px;color:#8899bb;margin-bottom:4px">County Roads — PASER Quality</div>
+    <div class="legend-row"><div class="legend-line" style="background:#22c55e"></div> PASER 5 — Excellent</div>
+    <div class="legend-row"><div class="legend-line" style="background:#86efac"></div> PASER 4 — Good</div>
+    <div class="legend-row"><div class="legend-line" style="background:#eab308"></div> PASER 3 — Fair</div>
+    <div class="legend-row"><div class="legend-line" style="background:#f97316"></div> PASER 2 — Poor</div>
+    <div class="legend-row"><div class="legend-line" style="background:#ef4444"></div> PASER 1 — Failed</div>
+    <div style="border-top:1px solid #334;margin:6px 0"></div>
+  </div>
+  <div class="legend-row"><div class="legend-line" style="background:#4a90d9"></div> MoDOT highways</div>
+  <div id="plain-county-legend" style="display:none">
+    <div class="legend-row"><div class="legend-line" style="background:#222222"></div> County roads</div>
+  </div>
+  <div class="legend-row"><div class="legend-line" style="background:#cc44cc"></div> Municipal streets</div>
+  <div class="legend-row"><div class="legend-line" style="background:#a86cc1;height:0;border-top:2px dashed #a86cc1"></div> City limits</div>
+</div>
 
-<!-- Mobile bottom sheet -->
+<button id="mob-fab" onclick="toggleMobPanel()" title="Layers">&#9776;</button>
+
 <div id="mobile-panel">
   <button class="mob-close" onclick="toggleMobPanel()">Close</button>
   <h3>Road &amp; Bridge GIS</h3>
-  <div class="mob-status" id="mob-status">Loading...</div>
-  <div class="mob-layer">
-    <input type="checkbox" id="m-modot" checked>
-    <div class="mob-swatch" style="background:#4a90d9"></div>
-    <label for="m-modot">MoDOT (state highways)</label>
-  </div>
-  <div class="mob-layer">
-    <input type="checkbox" id="m-county" checked>
-    <div class="mob-swatch" style="background:#5ab87a"></div>
-    <label for="m-county">Clinton County Commission</label>
-  </div>
-  <div class="mob-layer">
-    <input type="checkbox" id="m-municipal" checked>
-    <div class="mob-swatch" style="background:#cc44cc"></div>
-    <label for="m-municipal">Municipal (city streets)</label>
-  </div>
-  <div class="mob-layer">
-    <input type="checkbox" id="m-muni-bound" checked>
-    <div class="mob-swatch" style="background:#a86cc1;height:2px;border-style:dashed"></div>
-    <label for="m-muni-bound">City limits (boundary)</label>
-  </div>
+  <div style="font-size:11px;color:#6b7a99;margin-bottom:10px" id="mob-status">Loading...</div>
+  <div class="mob-layer"><input type="checkbox" id="m-quality" checked><div class="mob-swatch" style="background:linear-gradient(to right,#22c55e,#eab308,#ef4444)"></div><label for="m-quality">County Roads — LiDAR + Aerial</label></div>
+  <div class="mob-layer"><input type="checkbox" id="m-county"><div class="mob-swatch" style="background:#222222"></div><label for="m-county">County Roads (plain)</label></div>
+  <div class="mob-layer"><input type="checkbox" id="m-municipal" checked><div class="mob-swatch" style="background:#cc44cc"></div><label for="m-municipal">Municipal streets</label></div>
+  <div class="mob-layer"><input type="checkbox" id="m-modot" checked><div class="mob-swatch" style="background:#4a90d9"></div><label for="m-modot">MoDOT highways</label></div>
 </div>
 
 <script>
-const countyBounds = L.latLngBounds(L.latLng(39.35, -94.75), L.latLng(39.85, -94.05));
-const map = L.map('map', { maxBounds: countyBounds, maxBoundsViscosity: 0.9 }).setView([39.58, -94.40], 11);
+const countyBounds = L.latLngBounds(L.latLng(39.35,-94.75), L.latLng(39.85,-94.05));
+const map = L.map('map', {maxBounds:countyBounds, maxBoundsViscosity:0.9}).setView([39.58,-94.40], 11);
 
-const esri = L.tileLayer(
-  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
-  { maxZoom: 19, attribution: 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, USGS' }
-).addTo(map);
-const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' });
-const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles &copy; Esri' });
+const esri      = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',  {maxZoom:19, attribution:'Tiles &copy; Esri'}).addTo(map);
+const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {maxZoom:19, attribution:'Tiles &copy; Esri'});
 
 L.control.scale().addTo(map);
 
 const clintonBoundaryLayer = L.layerGroup().addTo(map);
-const modotLayer     = L.layerGroup().addTo(map);
-const countyLayer    = L.layerGroup().addTo(map);
-const municipalLayer = L.layerGroup().addTo(map);
-const muniBoundLayer = L.layerGroup().addTo(map);
+const modotLayer           = L.layerGroup();
+const countyLayer          = L.layerGroup();
+const qualityCombLayer     = L.layerGroup().addTo(map);
+const municipalLayer       = L.layerGroup();
+const muniBoundLayer       = L.layerGroup().addTo(map); // always on, not in control
 
-function label(color, text) {
-  return '<span style="display:inline-block;width:20px;height:4px;border-radius:2px;background:' + color + ';margin-right:6px;vertical-align:middle"></span>' + text;
+const paserColors = {5:'#22c55e', 4:'#86efac', 3:'#eab308', 2:'#f97316', 1:'#ef4444'};
+const paserLbl    = {5:'Excellent', 4:'Good', 3:'Fair', 2:'Poor', 1:'Failed'};
+
+function lbl(color, text) {
+  return '<span style="display:inline-block;width:20px;height:4px;border-radius:2px;background:'+color+';margin-right:6px;vertical-align:middle"></span>'+text;
 }
-const overlays = {
-  [label('#4a90d9', 'MoDOT (state highways)')]:   modotLayer,
-  [label('#5ab87a', 'Clinton County Commission')]: countyLayer,
-  [label('#cc44cc', 'Municipal (city streets)')]:  municipalLayer,
-  [label('#a86cc1', 'City limits (boundary)')]:    muniBoundLayer
-};
-L.control.layers(
-  { 'ESRI Street': esri, 'OpenStreetMap': osm, 'ESRI Satellite': satellite },
-  overlays, { collapsed: false, position: 'topleft' }
+
+// Layer order: LiDAR+Aerial first, then plain county, then municipal, then MoDOT
+const overlays = {};
+overlays['<span style="display:inline-block;width:20px;height:4px;border-radius:2px;background:linear-gradient(to right,#22c55e,#eab308,#ef4444);margin-right:6px;vertical-align:middle"></span>County Roads &mdash; LiDAR + Aerial'] = qualityCombLayer;
+overlays[lbl('#222222','County Roads (plain)')]    = countyLayer;
+overlays[lbl('#cc44cc','Municipal (city streets)')] = municipalLayer;
+overlays[lbl('#4a90d9','MoDOT (state highways)')]  = modotLayer;
+
+const layerCtrl = L.control.layers(
+  {'ESRI Street':esri, 'ESRI Satellite':satellite},
+  overlays, {collapsed:false, position:'topleft'}
 ).addTo(map);
 
-var loaded = 0, total = 5;
+map.addLayer(qualityCombLayer);
 
-function setStatus(msg) {
-  document.getElementById('status').textContent = msg;
-  document.getElementById('mob-status').textContent = msg;
+// Intercept layer control checkboxes for mutual exclusivity
+setTimeout(function() {
+  var container = layerCtrl.getContainer();
+  container.addEventListener('click', function(e) {
+    if (e.target.tagName !== 'INPUT' || e.target.type !== 'checkbox') return;
+    // Find which layer this checkbox controls
+    var label = e.target.closest('label') || e.target.parentElement;
+    var text = label ? label.textContent : '';
+    var isQuality = text.indexOf('LiDAR') !== -1;
+    var isCounty  = text.indexOf('plain') !== -1;
+    var isMunicipal = text.indexOf('Municipal') !== -1 || text.indexOf('city') !== -1;
+    var isMoDOT   = text.indexOf('MoDOT') !== -1;
+
+    if (e.target.checked) {
+      if (isQuality) {
+        // LiDAR+Aerial turned on — remove ALL other road layers, switch to ESRI Street
+        setTimeout(function() {
+          if (map.hasLayer(countyLayer))    map.removeLayer(countyLayer);
+          if (map.hasLayer(municipalLayer)) map.removeLayer(municipalLayer);
+          if (map.hasLayer(modotLayer))     map.removeLayer(modotLayer);
+          updatePanels();
+        }, 20);
+      } else if (isCounty) {
+        setTimeout(function() {
+          if (map.hasLayer(qualityCombLayer)) map.removeLayer(qualityCombLayer);
+          updatePanels();
+        }, 20);
+      } else {
+        // Any other layer turned on — remove LiDAR+Aerial
+        setTimeout(function() {
+          if (map.hasLayer(qualityCombLayer)) map.removeLayer(qualityCombLayer);
+          updatePanels();
+        }, 20);
+      }
+    } else {
+      setTimeout(updatePanels, 20);
+    }
+  });
+}, 500);
+
+// Position layer control below title panel
+function positionLayerControl() {
+  var tp = document.querySelector('.title-panel');
+  var lc = document.querySelector('.leaflet-top.leaflet-left .leaflet-control-layers');
+  if (tp && lc) lc.style.marginTop = (tp.getBoundingClientRect().bottom + 8) + 'px';
+}
+setTimeout(positionLayerControl, 300);
+window.addEventListener('resize', positionLayerControl);
+
+// Mutual exclusivity handled via layer control checkbox interception below
+
+// About panel + quality summary show/hide
+function updatePanels() {
+  var qActive = map.hasLayer(qualityCombLayer);
+  document.getElementById('about-panel').style.display           = qActive ? 'block' : 'none';
+  document.getElementById('quality-summary-panel').style.display = qActive ? 'block' : 'none';
+  document.getElementById('quality-legend').style.display        = qActive ? '' : 'none';
+  document.getElementById('plain-county-legend').style.display   = map.hasLayer(countyLayer) ? '' : 'none';
 }
 
-function popupContent(props, jurisdiction) {
-  var tigerName = props.FULLNAME || '';
-  var osmName   = props.OSM_NAME || '';
-  var displayName = osmName || tigerName || 'Unnamed Road';
-  var mtfccLabels = { 'S1100':'Primary Road','S1200':'Secondary Road','S1400':'Local Road','S1500':'Vehicular Trail','S1630':'Ramp','S1640':'Service Drive','S1730':'Alley','S1740':'Private Road','S1780':'Parking Lot' };
-  var html = '<div class="popup-title">' + displayName + '</div>';
-  html += '<div class="popup-row"><span class="popup-label">Maintained by</span><span class="popup-value">' + jurisdiction + '</span></div>';
-  if (props.MTFCC) html += '<div class="popup-row"><span class="popup-label">Road class</span><span class="popup-value">' + (mtfccLabels[props.MTFCC] || props.MTFCC) + '</span></div>';
+map.on('overlayadd overlayremove', function() {
+  updatePanels();
+  if (map.hasLayer(qualityCombLayer)) loadQualitySummary();
+});
+
+var loaded=0, total=6;
+function setStatus(msg) {
+  var mob = document.getElementById('mob-status');
+  if (mob) mob.textContent = msg;
+}
+
+function stdPopup(props, jurisdiction) {
+  var name = props.OSM_NAME || props.FULLNAME || 'Unnamed Road';
+  var mtfcc = {S1100:'Primary Road',S1200:'Secondary Road',S1400:'Local Road',S1500:'Vehicular Trail',S1740:'Private Road'};
+  var html = '<div class="popup-title">'+name+'</div>';
+  html += '<div class="popup-row"><span class="popup-label">Maintained by</span><span class="popup-value">'+jurisdiction+'</span></div>';
+  if (props.MTFCC) html += '<div class="popup-row"><span class="popup-label">Road class</span><span class="popup-value">'+(mtfcc[props.MTFCC]||props.MTFCC)+'</span></div>';
+  return html;
+}
+
+function qualityPopup(props) {
+  var name = props.OSM_NAME || props.FULLNAME || 'Unnamed Road';
+  var c = props.quality_color || 'yellow';
+  var isUnscored = !props.paser_combined && !props.paser && !props.paser_imagery;
+  var badgeClass = isUnscored ? 'badge-unscored' : 'badge-'+c;
+  var paser = props.paser_combined || props.paser || props.paser_imagery;
+  var miles = props.length_m ? (props.length_m/1609.34).toFixed(2) : '—';
+  var html = '<div class="popup-title">'+name+'</div>';
+  html += '<div class="popup-row"><span class="popup-label">Condition</span><span class="popup-value"><span class="popup-badge '+badgeClass+'">'+(props.quality_label||'Unscored')+'</span></span></div>';
+  if (paser) html += '<div class="popup-row"><span class="popup-label">PASER rating</span><span class="popup-value">'+paser+'/5 — '+(paserLbl[paser]||'')+'</span></div>';
+  if (props.conflict) html += '<div style="margin-top:5px;padding:4px 8px;background:#2d1a00;border-radius:4px;font-size:11px;color:#fbbf24">&#9888; '+props.conflict+'</div>';
+  if (props.paser_lidar && props.paser_imagery) {
+    html += '<div class="popup-row"><span class="popup-label">LiDAR score</span><span class="popup-value">'+props.paser_lidar+'/5</span></div>';
+    html += '<div class="popup-row"><span class="popup-label">Imagery score</span><span class="popup-value">'+props.paser_imagery+'/5</span></div>';
+  }
+  if (props.cross_slope_pct) html += '<div class="popup-row"><span class="popup-label">Cross slope</span><span class="popup-value">'+props.cross_slope_pct+'%</span></div>';
+  if (props.surface_condition) html += '<div class="popup-row"><span class="popup-label">Surface</span><span class="popup-value">'+props.surface_condition+'</span></div>';
+  if (props.visible_distress && props.visible_distress.length > 0) html += '<div class="popup-row"><span class="popup-label">Distress</span><span class="popup-value" style="font-size:11px">'+props.visible_distress+'</span></div>';
+  if (props.ai_notes) html += '<div style="margin-top:5px;font-size:10px;color:#aab;font-style:italic">'+props.ai_notes+'</div>';
+  html += '<div class="popup-row" style="margin-top:4px"><span class="popup-label">Length</span><span class="popup-value">'+miles+' mi</span></div>';
+  if (props.data_source) html += '<div style="margin-top:5px;font-size:10px;color:#556;font-style:italic">'+props.data_source+'</div>';
   return html;
 }
 
 async function loadLayer(url, target, style, jurisdiction) {
   try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('HTTP ' + response.status);
-    const data = await response.json();
-    if (data.features && data.features.length > 0) {
+    const r = await fetch(url); if (!r.ok) throw new Error('HTTP '+r.status);
+    const data = await r.json();
+    if (data.features && data.features.length) {
       L.geoJSON(data, {
         style: style,
-        onEachFeature: function(feature, layer) {
-          layer.bindPopup(popupContent(feature.properties || {}, jurisdiction), { maxWidth: 260 });
-          layer.on('mouseover', function() { layer.setStyle({ weight: style.weight + 2, opacity: 1 }); });
+        onEachFeature: function(feat, layer) {
+          layer.bindPopup(stdPopup(feat.properties||{}, jurisdiction), {maxWidth:280});
+          layer.on('popupopen', async function(e) {
+            var center = layer.getBounds ? layer.getBounds().getCenter() : e.popup.getLatLng();
+            var localName = await getLocalRoadName(center);
+            if (localName) {
+              var titleEl = e.popup.getElement().querySelector('.popup-title');
+              var censusName = feat.properties.OSM_NAME || feat.properties.FULLNAME || '';
+              if (titleEl && localName.toLowerCase() !== censusName.toLowerCase()) {
+                titleEl.innerHTML = localName + '<div style="font-size:11px;color:#6b7a99;font-weight:normal;margin-top:2px">' + censusName + '</div>';
+              }
+            }
+          });
+          layer.on('mouseover', function() { layer.setStyle({weight:style.weight+2,opacity:1}); });
           layer.on('mouseout',  function() { layer.setStyle(style); });
         }
       }).addTo(target);
     }
-    loaded++;
-    setStatus(loaded < total ? 'Loading (' + loaded + '/' + total + ')...' : 'All layers loaded — tap any road for details');
-  } catch(err) { console.error(jurisdiction + ' failed:', err); loaded++; }
+    loaded++; setStatus(loaded<total?'Loading...' : 'All layers loaded');
+  } catch(e){ console.error('loadLayer failed for '+url, e); loaded++; setStatus('Error loading layer — check console'); }
+}
+
+async function loadQualityLayer(url, target) {
+  try {
+    const r = await fetch(url); if (!r.ok) throw new Error('HTTP '+r.status);
+    const data = await r.json();
+    if (data.features && data.features.length) {
+      L.geoJSON(data, {
+        style: function(feat) {
+          var p = feat.properties;
+          var paser = p.paser_combined || p.paser || p.paser_imagery;
+          return {color: paser ? (paserColors[paser]||'#eab308') : '#eab308', weight:3, opacity:0.9};
+        },
+        onEachFeature: function(feat, layer) {
+          var p = feat.properties;
+          var paser = p.paser_combined || p.paser || p.paser_imagery;
+          var col = paser ? (paserColors[paser]||'#eab308') : '#eab308';
+          layer.bindPopup(qualityPopup(p), {maxWidth:300});
+          layer.on('popupopen', async function(e) {
+            var center = layer.getBounds ? layer.getBounds().getCenter() : e.popup.getLatLng();
+            var localName = await getLocalRoadName(center);
+            if (localName) {
+              var titleEl = e.popup.getElement().querySelector('.popup-title');
+              var censusName = p.OSM_NAME || p.FULLNAME || '';
+              if (titleEl && localName.toLowerCase() !== censusName.toLowerCase()) {
+                titleEl.innerHTML = localName + '<div style="font-size:11px;color:#6b7a99;font-weight:normal;margin-top:2px">' + censusName + '</div>';
+              }
+            }
+          });
+          layer.on('mouseover', function() { layer.setStyle({weight:5,opacity:1}); });
+          layer.on('mouseout',  function() { layer.setStyle({color:col,weight:3,opacity:0.9}); });
+        }
+      }).addTo(target);
+    }
+    loaded++; setStatus(loaded<total?'Loading...' : 'All layers loaded');
+  } catch(e){ console.error('Quality layer:',e); loaded++; }
 }
 
 async function loadBoundary(url, style, target) {
   try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('HTTP ' + response.status);
-    const data = await response.json();
-    if (data.features && data.features.length > 0) {
-      L.geoJSON(data, { style: style }).addTo(target);
+    const r = await fetch(url); if (!r.ok) throw new Error('HTTP '+r.status);
+    const data = await r.json();
+    if (data.features && data.features.length) L.geoJSON(data,{style:style}).addTo(target);
+    loaded++; setStatus(loaded<total?'Loading...' : 'All layers loaded');
+  } catch(e){ console.error('Boundary:',e); loaded++; }
+}
+
+async function loadQualitySummary() {
+  try {
+    const r = await fetch('/api/roads/quality_combined/summary'); if (!r.ok) return;
+    const d = await r.json();
+    document.getElementById('q-green-block').textContent  = d.miles.green+' mi';
+    document.getElementById('q-yellow-block').textContent = d.miles.yellow+' mi';
+    document.getElementById('q-red-block').textContent    = d.miles.red+' mi';
+    document.getElementById('q-source').textContent = 'Source: '+d.source;
+    // PASER breakdown
+    if (d.paser_counts) {
+      for (var p=1; p<=5; p++) {
+        var el = document.getElementById('pb-'+p);
+        if (el) el.textContent = (d.paser_counts[p]||0)+' segments';
+      }
     }
-    loaded++;
-    setStatus(loaded < total ? 'Loading (' + loaded + '/' + total + ')...' : 'All layers loaded — tap any road for details');
-  } catch(err) { console.error('Boundary failed:', err); loaded++; }
+  } catch(e){ console.error('Summary:',e); }
+}
+
+// Reverse geocode a lat/lng to get local road name from OSM Nominatim
+async function getLocalRoadName(latlng) {
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${latlng.lat}&lon=${latlng.lng}&format=json&zoom=16`;
+    const r = await fetch(url, { headers: { 'User-Agent': 'ClintonCountyGIS/1.0' } });
+    if (!r.ok) return null;
+    const d = await r.json();
+    return d.address && d.address.road ? d.address.road : null;
+  } catch(e) { return null; }
 }
 
 async function loadMap() {
-  await loadBoundary('/api/roads/clinton', { color: '#ffffff', weight: 2.5, dashArray: '6,4', fillOpacity: 0.0 }, clintonBoundaryLayer);
-  await loadBoundary('/api/roads/muni_boundaries', { color: '#a86cc1', weight: 1.5, dashArray: '5,4', fillOpacity: 0.05, fillColor: '#a86cc1' }, muniBoundLayer);
-  await loadLayer('/api/roads/modot',     modotLayer,     { color: '#4a90d9', weight: 4,   opacity: 1 }, 'MoDOT');
-  await loadLayer('/api/roads/county',    countyLayer,    { color: '#5ab87a', weight: 2.5, opacity: 1 }, 'Clinton County Commission');
-  await loadLayer('/api/roads/municipal', municipalLayer, { color: '#cc44cc', weight: 2.5, opacity: 1 }, 'Municipal');
+  await loadBoundary('/api/roads/clinton',         {color:'#ffffff',weight:2.5,dashArray:'6,4',fillOpacity:0}, clintonBoundaryLayer);
+  await loadBoundary('/api/roads/muni_boundaries', {color:'#a86cc1',weight:1.5,dashArray:'5,4',fillOpacity:0.05,fillColor:'#a86cc1'}, muniBoundLayer);
+  await loadLayer('/api/roads/modot',     modotLayer,     {color:'#4a90d9',weight:4,  opacity:1}, 'MoDOT');
+  // Load county plain into layer group (renders when group added to map)
+  await loadLayer('/api/roads/county', countyLayer, {color:'#222222',weight:2.5,opacity:0.9}, 'Clinton County Commission');
+  await loadLayer('/api/roads/municipal', municipalLayer, {color:'#cc44cc',weight:2.5,opacity:1}, 'Municipal');
+  await loadQualityLayer('/api/roads/county_quality_combined', qualityCombLayer);
+  await loadQualitySummary();
+  updatePanels();
+  positionLayerControl();
 }
 
 loadMap();
 
-// Mobile panel toggle
 function toggleMobPanel() {
-  const panel = document.getElementById('mobile-panel');
-  panel.classList.toggle('open');
-  setTimeout(() => map.invalidateSize(), 250);
+  document.getElementById('mobile-panel').classList.toggle('open');
+  setTimeout(()=>map.invalidateSize(), 250);
 }
 
-// Mobile layer checkboxes wire up to the same layer groups
-document.getElementById('m-modot').addEventListener('change', function(e) {
-  e.target.checked ? modotLayer.addTo(map) : map.removeLayer(modotLayer);
+document.getElementById('m-quality').addEventListener('change', function(e) {
+  if (e.target.checked) {
+    qualityCombLayer.addTo(map);
+    if (map.hasLayer(countyLayer)) map.removeLayer(countyLayer);
+  } else {
+    map.removeLayer(qualityCombLayer);
+  }
 });
 document.getElementById('m-county').addEventListener('change', function(e) {
-  e.target.checked ? countyLayer.addTo(map) : map.removeLayer(countyLayer);
+  if (e.target.checked) {
+    if (map.hasLayer(qualityCombLayer)) map.removeLayer(qualityCombLayer);
+    countyLayer.addTo(map);
+  } else {
+    map.removeLayer(countyLayer);
+  }
 });
 document.getElementById('m-municipal').addEventListener('change', function(e) {
-  e.target.checked ? municipalLayer.addTo(map) : map.removeLayer(municipalLayer);
+  if (e.target.checked) {
+    if (map.hasLayer(qualityCombLayer)) map.removeLayer(qualityCombLayer);
+    municipalLayer.addTo(map);
+  } else { map.removeLayer(municipalLayer); }
 });
-document.getElementById('m-muni-bound').addEventListener('change', function(e) {
-  e.target.checked ? muniBoundLayer.addTo(map) : map.removeLayer(muniBoundLayer);
+document.getElementById('m-modot').addEventListener('change', function(e) {
+  if (e.target.checked) {
+    if (map.hasLayer(qualityCombLayer)) map.removeLayer(qualityCombLayer);
+    modotLayer.addTo(map);
+  } else { map.removeLayer(modotLayer); }
 });
-
-window.addEventListener('resize', () => map.invalidateSize());
+window.addEventListener('resize', ()=>map.invalidateSize());
 </script>
 </body>
 </html>
