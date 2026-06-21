@@ -89,7 +89,9 @@
 
     /* Mobile */
     @media (max-width:700px) {
-      .title-panel { display:none; }
+      .title-panel { width:calc(100% - 20px); font-size:12px; padding:7px 12px; top:10px; left:10px; right:10px; }
+      .title-panel .title-main { font-size:16px; }
+      .title-panel .title-sub  { font-size:11px; }
       .leaflet-control-layers { display:none !important; }
       .legend-panel { display:none; }
       #quality-summary-panel { display:none !important; }
